@@ -251,7 +251,7 @@ class ArrangementEditor:
                 self.renderer.draw_all(self.state, self.show_chords)
 
     def _on_resize(self, event):
-        if self.song is None or self.renderer is None:
+        if self.arrangement is None or self.renderer is None:
             return
         self.renderer.draw_all(self.state, self.show_chords)
 
