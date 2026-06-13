@@ -3,12 +3,12 @@ import json
 from pathlib import Path
 import numpy as np
 
-from domain.models import Bar, Section, SongStructure
+from domain.models import Arrangement, Bar, Section, Beat
 
 
 class Allin1Importer:
     @staticmethod
-    def load(path: str | Path) -> SongStructure:
+    def load(path: str | Path) -> Arrangement:
         raw = Allin1Importer._load_raw(path)
         return Allin1Importer._flatten(raw)
 
@@ -55,37 +55,27 @@ class Allin1Importer:
         return sections
 
     @staticmethod
-    def _flatten(data: dict) -> SongStructure:
+    def _flatten(data: dict) -> Arrangement:
         raw_bars = Allin1Importer._build_bar_list(data)
         sections_data = Allin1Importer._build_sections(data, raw_bars)
 
-        times_ms = []
-        numbers = []
-        bars = []
         section_list = []
+        bar_idx = 0
         for sec_idx, sec in enumerate(sections_data):
-            sec_bar_start = len(bars)
+            bars = []
             for bar_data in sec["bars"]:
-                start_idx = len(times_ms)
-                for beat in bar_data:
-                    times_ms.append(beat["time_ms"])
-                    numbers.append(beat["beat"])
-                bars.append(Bar(
-                    idx=len(bars),
-                    start_beat_idx=start_idx,
-                    n_beats=len(bar_data),
-                    beat_numbers=tuple(b["beat"] for b in bar_data),
-                ))
-            section_list.append(Section(
-                idx=sec_idx,
-                name=sec["name"],
-                first_bar=sec_bar_start,
-                end_bar=len(bars),
-            ))
+                beats = tuple(
+                    Beat(time_ms=beat["time_ms"], position=beat["beat"], chord="")
+                    for beat in bar_data
+                )
+                bars.append(Bar(idx=bar_idx, beats=beats))
+                bar_idx += 1
+            section_list.append(Section(idx=sec_idx, name=sec["name"], bars=bars))
 
-        return SongStructure(
-            beat_times_ms=np.array(times_ms, dtype=np.int64),
-            beat_numbers=np.array(numbers, dtype=int),
-            bars=bars,
+        arrangement = Arrangement(
+            name="",
+            master=True,
             sections=section_list,
         )
+        arrangement.reindex(sr=1)
+        return arrangement

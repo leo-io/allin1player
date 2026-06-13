@@ -1,3 +1,3 @@
-from .coordinator import create_player
+from .coordinator import create_editor
 
-__all__ = ["create_player"]
+__all__ = ["create_editor"]

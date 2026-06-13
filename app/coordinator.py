@@ -1,8 +1,8 @@
 from __future__ import annotations
 from pathlib import Path
 
-from ui.app import BeatPlayer
+from ui.app import ArrangementEditor
 
 
-def create_player(audio_path: str | None = None, json_path: str | None = None) -> BeatPlayer:
-    return BeatPlayer(audio_path=audio_path, beats_path=json_path)
+def create_editor(audio_path: str | None = None, json_path: str | None = None) -> ArrangementEditor:
+    return ArrangementEditor(audio_path=audio_path, beats_path=json_path)

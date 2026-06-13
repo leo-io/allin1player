@@ -1,4 +1,4 @@
 from .renderer import CanvasRenderer
-from .app import BeatPlayer
+from .app import ArrangementEditor
 
-__all__ = ["CanvasRenderer", "BeatPlayer"]
+__all__ = ["CanvasRenderer", "ArrangementEditor"]

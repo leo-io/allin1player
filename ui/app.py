@@ -7,15 +7,15 @@ from tkinter import ttk
 import numpy as np
 import soundfile as sf
 
-from domain.models import ArrangementDocument, SongStructure, Command
-from file_io.project_store import ProjectStore
+from domain.models import Arrangement
+from file_io.arrangement_store import ArrangementStore
 from file_io.chord_loader import ChordLoader
 from playback.engine import PlaybackEngine
 from playback.state import TransportState, VirtualQueue
 from ui.renderer import CanvasRenderer
 
 
-class BeatPlayer:
+class ArrangementEditor:
     def __init__(self, audio_path=None, beats_path=None):
         self.audio_path = None
         self.audio_data = None
@@ -24,13 +24,10 @@ class BeatPlayer:
 
         self.lock = threading.RLock()
         self.state = TransportState()
-        self.song: SongStructure | None = None
-        self.doc: ArrangementDocument | None = None
+        self.arrangement: Arrangement | None = None
         self.engine = None
         self.renderer = None
         self.show_chords = True
-        self.undo_stack: list[Command] = []
-        self.redo_stack: list[Command] = []
 
         self.audio_files = sorted(
             list(Path(".").glob("*.mp3")) + list(Path(".").glob("*.wav"))
@@ -45,7 +42,7 @@ class BeatPlayer:
 
     def _build_ui(self):
         self.root = tk.Tk()
-        self.root.title("Allin1 Player")
+        self.root.title("Arrangement Editor")
         self.root.configure(bg="#1a1a2e")
         self.root.minsize(1000, 500)
 
@@ -67,18 +64,13 @@ class BeatPlayer:
         self.menu_bar = tk.Menu(self.root, bg="#1a1a2e", fg="#e0e0e0")
         self.root.config(menu=self.menu_bar)
 
-        version_menu = tk.Menu(self.menu_bar, tearoff=0, bg="#1a1a2e", fg="#e0e0e0")
-        version_menu.add_command(label="Save Project", command=self._cmd_save_project)
-        version_menu.add_command(label="New Version", command=self._cmd_new_version)
-        version_menu.add_command(label="Rename Version", command=self._cmd_rename_version)
-        version_menu.add_separator()
-        version_menu.add_command(label="Undo", command=self._cmd_undo)
-        version_menu.add_command(label="Redo", command=self._cmd_redo)
-        version_menu.add_separator()
+        file_menu = tk.Menu(self.menu_bar, tearoff=0, bg="#1a1a2e", fg="#e0e0e0")
+        file_menu.add_command(label="Save", command=self._cmd_save)
+        file_menu.add_separator()
         self.show_chords_var = tk.BooleanVar(value=True)
-        version_menu.add_checkbutton(label="Show Chords", variable=self.show_chords_var,
-                                     command=self._toggle_chords)
-        self.menu_bar.add_cascade(label="Version", menu=version_menu)
+        file_menu.add_checkbutton(label="Show Chords", variable=self.show_chords_var,
+                                  command=self._toggle_chords)
+        self.menu_bar.add_cascade(label="File", menu=file_menu)
 
         cframe = tk.Frame(content, bg="#1a1a2e")
         cframe.pack(fill="both", expand=True, padx=10, pady=(4, 0))
@@ -109,108 +101,16 @@ class BeatPlayer:
         self.root.bind("<Key-Escape>", lambda e: self._on_key("escape"))
         self.root.bind("<Key-c>", lambda e: self._on_key("c"))
         self.root.bind("<Key-C>", lambda e: self._on_key("c"))
-        self.root.bind("<Control-z>", lambda e: self._cmd_undo())
-        self.root.bind("<Control-Z>", lambda e: self._cmd_undo())
-        self.root.bind("<Control-y>", lambda e: self._cmd_redo())
-        self.root.bind("<Control-Y>", lambda e: self._cmd_redo())
-        self.root.bind("<Control-s>", lambda e: self._cmd_save_project())
-        self.root.bind("<Control-S>", lambda e: self._cmd_save_project())
+        self.root.bind("<Control-s>", lambda e: self._cmd_save())
+        self.root.bind("<Control-S>", lambda e: self._cmd_save())
 
-    # ------------------------------------------------------------------ command layer
+    # ------------------------------------------------------------------ commands
 
-    def _execute(self, cmd: Command):
-        self.undo_stack.append(cmd)
-        self.redo_stack.clear()
-        self._apply(cmd)
-        self.state.dirty = True
-
-    def _apply(self, cmd: Command):
-        doc = self.doc
-        if doc is None:
+    def _cmd_save(self):
+        if self.arrangement is None or self.audio_path is None:
             return
-        v = doc.active_version
-        if v is None:
-            return
-
-        if cmd.type == "rename_section":
-            sec_idx = cmd.params["section_idx"]
-            new_name = cmd.params["name"]
-            if sec_idx < len(doc.source.sections):
-                old = doc.source.sections[sec_idx]
-                doc.source.sections[sec_idx] = type(old)(
-                    idx=old.idx, name=new_name,
-                    first_bar=old.first_bar, end_bar=old.end_bar
-                )
-        elif cmd.type == "set_active_version":
-            doc.active_version_idx = cmd.params["version_idx"]
-        elif cmd.type == "rename_version":
-            if cmd.params["version_idx"] < len(doc.versions):
-                old = doc.versions[cmd.params["version_idx"]]
-                doc.versions[cmd.params["version_idx"]] = type(old)(
-                    name=cmd.params["name"],
-                    section_ordering=old.section_ordering,
-                )
-
-    def _cmd_undo(self):
-        if not self.undo_stack:
-            return
-        cmd = self.undo_stack.pop()
-        self.redo_stack.append(cmd)
-        self._rebuild_from_doc()
-        self.state.dirty = True
-
-    def _cmd_redo(self):
-        if not self.redo_stack:
-            return
-        cmd = self.redo_stack.pop()
-        self.undo_stack.append(cmd)
-        self._apply(cmd)
-        self._rebuild_from_doc()
-        self.state.dirty = True
-
-    def _rebuild_from_doc(self):
-        if self.doc is None:
-            return
-        self.song = self.doc.source
-        self.renderer = CanvasRenderer(self.canvas, self.song)
-        self.renderer.draw_all(self.state, self.show_chords)
-
-    def _cmd_save_project(self):
-        if self.doc is None or self.audio_path is None:
-            return
-        ProjectStore.save(self.doc, self.audio_path)
+        ArrangementStore.save(self.arrangement, self.audio_path)
         self.state.dirty = False
-
-    def _cmd_new_version(self):
-        if self.doc is None:
-            return
-        count = len(self.doc.versions)
-        self.doc.add_version(f"Version {count + 1}")
-        self._execute(Command("set_active_version", {"version_idx": self.doc.active_version_idx}))
-        self._rebuild_from_doc()
-
-    def _cmd_rename_version(self):
-        if self.doc is None:
-            return
-        dialog = tk.Toplevel(self.root)
-        dialog.title("Rename Version")
-        dialog.configure(bg="#1a1a2e")
-        tk.Label(dialog, text="New name:", bg="#1a1a2e", fg="#e0e0e0").pack(padx=10, pady=5)
-        entry = tk.Entry(dialog, width=30)
-        entry.pack(padx=10, pady=5)
-        entry.focus()
-
-        def do_rename():
-            name = entry.get().strip()
-            if name and self.doc:
-                self._execute(Command("rename_version", {
-                    "version_idx": self.doc.active_version_idx,
-                    "name": name,
-                }))
-                self._rebuild_from_doc()
-            dialog.destroy()
-
-        tk.Button(dialog, text="OK", command=do_rename).pack(pady=5)
 
     def _toggle_chords(self):
         self.show_chords = self.show_chords_var.get()
@@ -244,30 +144,22 @@ class BeatPlayer:
         self.audio_data = raw.astype(np.float32)
         self.total_ms = len(self.audio_data) * 1000 / self.sr
 
-        self.doc, self.song = ProjectStore.load_or_create(str(p), str(bp))
+        self.arrangement = ArrangementStore.load_or_create(str(p), str(bp))
 
         cp = p.with_suffix(".madmom.chords.txt")
-        self.song.chords = ChordLoader.load(str(cp), self.song)
-        self.song.beat_chords = ChordLoader.compute_beat_chords(
-            self.song.chords, self.song.beat_times_ms,
-        )
+        ChordLoader.assign_chords(self.arrangement, str(cp))
 
-        self.song.bar_frames = np.array(
-            [int(round(self.song.beat_times_ms[b.start_beat_idx] * self.sr / 1000))
-             for b in self.song.bars]
-            + [len(self.audio_data)],
-            dtype=np.int64,
-        )
-        self.song.total_frames = len(self.audio_data)
+        self.arrangement.reindex(self.sr)
+        self.arrangement.set_bar_frames(self.sr, len(self.audio_data))
 
         with self.lock:
             self.state = TransportState()
 
-        self.engine = PlaybackEngine(self.audio_data, self.song, self.state, self.lock, self.sr)
-        self.renderer = CanvasRenderer(self.canvas, self.song)
+        self.engine = PlaybackEngine(self.audio_data, self.arrangement, self.state, self.lock, self.sr)
+        self.renderer = CanvasRenderer(self.canvas, self.arrangement)
 
         self.audio_path = p
-        self.root.title(f"Allin1 Player — {p.name}")
+        self.root.title(f"Arrangement Editor — {p.name}")
         self.filename_label.config(text=p.name)
         self.time_label.config(text=self._fmt(0))
         self.play_btn.config(state="normal", text="Play")
@@ -282,7 +174,7 @@ class BeatPlayer:
         cx, cy = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
         is_ctrl = bool(event.state & 0x4)
 
-        if self.song is None:
+        if self.arrangement is None:
             return
 
         bar_idx = self.renderer.bar_at_xy(cx, cy)
@@ -302,6 +194,15 @@ class BeatPlayer:
                 self.renderer.draw_all(self.state, self.show_chords)
             else:
                 self.state.selected = ("bar", bar_idx)
+                if self.state.playing:
+                    with self.lock:
+                        self.state.vq = VirtualQueue(
+                            bars=[bar_idx],
+                            entry_bar=bar_idx,
+                            pos=0,
+                            active=True,
+                        )
+                        self.state.dirty = True
                 self.renderer.draw_all(self.state, self.show_chords)
             return
 
@@ -323,15 +224,18 @@ class BeatPlayer:
                     self.state.dirty = True
                 self.renderer.draw_all(self.state, self.show_chords)
                 return
-            if self.state.selected and self.song is not None:
+            if self.state.selected and self.arrangement is not None:
+                bars_flat = self.arrangement.bars
                 with self.lock:
                     if self.state.selected[0] == "bar":
                         bi = self.state.selected[1]
                         target_range = (bi, bi + 1)
                     elif self.state.selected[0] == "section":
                         si = self.state.selected[1]
-                        sec = self.song.sections[si]
-                        target_range = (sec.first_bar, sec.end_bar)
+                        sec = self.arrangement.sections[si]
+                        sec_first_bar_idx = bars_flat.index(sec.bars[0]) if sec.bars else 0
+                        sec_end_bar_idx = sec_first_bar_idx + len(sec.bars)
+                        target_range = (sec_first_bar_idx, sec_end_bar_idx)
                     else:
                         return
                     self.state.loop_range = None if self.state.loop_range == target_range else target_range
@@ -343,7 +247,7 @@ class BeatPlayer:
             with self.lock:
                 self.state.vq = None
                 self.state.dirty = True
-            if self.song is not None:
+            if self.arrangement is not None:
                 self.renderer.draw_all(self.state, self.show_chords)
 
     def _on_resize(self, event):

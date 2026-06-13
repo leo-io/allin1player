@@ -2,7 +2,7 @@ from __future__ import annotations
 import tkinter as tk
 import numpy as np
 
-from domain.models import SongStructure
+from domain.models import Arrangement
 from playback.state import TransportState
 
 
@@ -27,9 +27,9 @@ ROW_LABEL_W = 48
 
 
 class CanvasRenderer:
-    def __init__(self, canvas: tk.Canvas, song: SongStructure):
+    def __init__(self, canvas: tk.Canvas, arrangement: Arrangement):
         self.canvas = canvas
-        self.song = song
+        self.arrangement = arrangement
         self.bar_items = []
         self.section_items = []
 
@@ -76,11 +76,15 @@ class CanvasRenderer:
         actual_avail = cw - PAD * 2 - ROW_LABEL_W - BAR_GAP * (bpr - 1)
         actual_bar_w = max(50, actual_avail // bpr)
 
+        bars_flat = self.arrangement.bars
         y = PAD
-        for sec in self.song.sections:
+        for sec in self.arrangement.sections:
+            sec_first_bar_idx = bars_flat.index(sec.bars[0]) if sec.bars else 0
+            sec_end_bar_idx = sec_first_bar_idx + len(sec.bars)
+
             sec_is_selected = state.selected == ("section", sec.idx)
-            sec_is_looping = state.loop_range == (sec.first_bar, sec.end_bar)
-            header_text = f"{sec.name.upper()} [{sec.end_bar - sec.first_bar}]"
+            sec_is_looping = state.loop_range == (sec_first_bar_idx, sec_end_bar_idx)
+            header_text = f"{sec.name.upper()} [{len(sec.bars)}]"
             header_bg_color = "#2a3a5a" if (sec_is_selected or sec_is_looping) else "#1a2a40"
             header_text_color = "#ffd700" if sec_is_looping else "#aaa" if sec_is_selected else "#666"
 
@@ -97,17 +101,16 @@ class CanvasRenderer:
                 "bg": header_bg,
                 "text": header_text_id,
                 "sec_idx": sec.idx,
-                "range": (sec.first_bar, sec.end_bar),
+                "range": (sec_first_bar_idx, sec_end_bar_idx),
             })
             y += SECTION_HEADER_H + 4
 
-            for row_offset in range(0, sec.end_bar - sec.first_bar, bpr):
-                row_bars_indices = list(range(sec.first_bar + row_offset,
-                                              min(sec.first_bar + row_offset + bpr, sec.end_bar)))
+            for row_offset in range(0, len(sec.bars), bpr):
+                row_bars = sec.bars[row_offset:row_offset + bpr]
                 x = PAD
 
-                for bar_idx in row_bars_indices:
-                    bar = self.song.bars[bar_idx]
+                for bar in row_bars:
+                    bar_idx = bars_flat.index(bar)
                     nb = bar.n_beats
                     beat_w = max(MIN_BEAT_W, int((actual_bar_w - 2) / nb))
                     bw = beat_w * nb + 2
@@ -121,14 +124,13 @@ class CanvasRenderer:
                     )
 
                     beat_rects = []
-                    has_chords = len(self.song.beat_chords) > 0
-                    show_chord_labels = show_chords and has_chords
+                    show_chord_labels = show_chords
                     vq = state.vq
-                    for bii, bn in enumerate(bar.beat_numbers):
+                    for bii, beat in enumerate(bar.beats):
                         bx = rx + 1 + bii * beat_w
                         bw2 = max(1, beat_w - 1)
                         bh = BAR_H - 4
-                        is_db = bn == 1
+                        is_db = beat.position == 1
                         fill = "#665533" if is_db else BEAT_OFF
                         r = self.canvas.create_rectangle(
                             bx, ry + 2, bx + bw2, ry + 2 + bh,
@@ -137,9 +139,9 @@ class CanvasRenderer:
 
                         t = None
                         if beat_w >= 14:
-                            beat_idx = bar.start_beat_idx + bii
-                            chord = self.song.chord_at_beat(beat_idx)
-                            prev_chord = self.song.chord_at_beat(beat_idx - 1) if beat_idx > 0 else ""
+                            chord = beat.chord
+                            prev_beat = bar.beats[bii - 1] if bii > 0 else None
+                            prev_chord = prev_beat.chord if prev_beat else ""
                             is_chord_change = show_chord_labels and chord and chord != "N" and chord != prev_chord
 
                             if vq is not None and bii == nb - 1 and bar_idx in vq.bars:
@@ -156,7 +158,7 @@ class CanvasRenderer:
                                     font=("Segoe UI", 9),
                                 )
                             elif is_db and not show_chord_labels:
-                                bar_num = bar_idx - sec.first_bar + 1
+                                bar_num = len(sec.bars[:row_offset]) + row_bars.index(bar) + 1
                                 t = self.canvas.create_text(
                                     bx + bw2 // 2, ry + 2 + bh // 2,
                                     text=str(bar_num), fill="#ddd", font=("Segoe UI", 7),
@@ -166,10 +168,10 @@ class CanvasRenderer:
                     self.bar_items.append({
                         "bg": bg,
                         "beats": beat_rects,
-                        "start_idx": bar.start_beat_idx,
-                        "bar_idx": bar.idx,
-                        "bar_num": bar.idx + 1,
+                        "bar_idx": bar_idx,
+                        "bar_num": bar_idx + 1,
                         "n_beats": nb,
+                        "beats_data": bar.beats,
                     })
                     x += bw + BAR_GAP
                 y += self._row_total_h
@@ -177,8 +179,7 @@ class CanvasRenderer:
         self.canvas.configure(scrollregion=(0, 0, cw, y + PAD))
 
     def update_playhead(self, frame_idx: int, ms: float, state: TransportState):
-        idx = np.searchsorted(self.song.beat_times_ms, ms, side="right") - 1
-        if idx < 0 or idx >= len(self.song.beat_times_ms):
+        if len(self.arrangement.beat_times_ms) == 0:
             for item in self.bar_items:
                 bi = item["bar_idx"]
                 outline, width = self._bar_outline(bi, state)
@@ -186,27 +187,45 @@ class CanvasRenderer:
                                        fill=self._bar_bg_color(bi, state),
                                        outline=outline, width=width)
                 for bii, (r, t) in enumerate(item["beats"]):
-                    is_db = self.song.beat_numbers[item["start_idx"] + bii] == 1
+                    beat = item["beats_data"][bii]
+                    is_db = beat.position == 1
+                    self.canvas.itemconfig(r, fill="#665533" if is_db else BEAT_OFF)
+            return
+
+        beat_idx = int(np.searchsorted(self.arrangement.beat_times_ms, ms, side="right") - 1)
+        if beat_idx < 0 or beat_idx >= len(self.arrangement.beat_times_ms):
+            for item in self.bar_items:
+                bi = item["bar_idx"]
+                outline, width = self._bar_outline(bi, state)
+                self.canvas.itemconfig(item["bg"],
+                                       fill=self._bar_bg_color(bi, state),
+                                       outline=outline, width=width)
+                for bii, (r, t) in enumerate(item["beats"]):
+                    beat = item["beats_data"][bii]
+                    is_db = beat.position == 1
                     self.canvas.itemconfig(r, fill="#665533" if is_db else BEAT_OFF)
             return
 
         current_item = None
+        beat_offset_in_bar = None
+        cumulative_idx = 0
         for item in self.bar_items:
-            si = item["start_idx"]
-            if si <= idx < si + item["n_beats"]:
+            bar_beat_count = len(item["beats_data"])
+            if cumulative_idx <= beat_idx < cumulative_idx + bar_beat_count:
                 current_item = item
+                beat_offset_in_bar = beat_idx - cumulative_idx
                 break
+            cumulative_idx += bar_beat_count
 
         for item in self.bar_items:
-            si = item["start_idx"]
             bi = item["bar_idx"]
-            if item is current_item:
+            if item is current_item and beat_offset_in_bar is not None:
                 self.canvas.itemconfig(item["bg"],
                                        fill=BAR_ACTIVE, outline=DOWNBEAT, width=2)
-                beat_offset = idx - si
                 for bii, (r, t) in enumerate(item["beats"]):
-                    is_db = self.song.beat_numbers[si + bii] == 1
-                    if bii == beat_offset:
+                    beat = item["beats_data"][bii]
+                    is_db = beat.position == 1
+                    if bii == beat_offset_in_bar:
                         fill = DOWNBEAT if is_db else BEAT_ON
                     else:
                         fill = "#665533" if is_db else BEAT_OFF
@@ -217,7 +236,8 @@ class CanvasRenderer:
                                        fill=self._bar_bg_color(bi, state),
                                        outline=outline, width=width)
                 for bii, (r, t) in enumerate(item["beats"]):
-                    is_db = self.song.beat_numbers[si + bii] == 1
+                    beat = item["beats_data"][bii]
+                    is_db = beat.position == 1
                     self.canvas.itemconfig(r, fill="#665533" if is_db else BEAT_OFF)
 
         if current_item:

@@ -1,111 +1,120 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Optional
+import copy
 import numpy as np
+
+
+@dataclass(frozen=True)
+class Beat:
+    time_ms: int
+    position: int
+    chord: str = ""
 
 
 @dataclass(frozen=True)
 class Bar:
     idx: int
-    start_beat_idx: int
-    n_beats: int
-    beat_numbers: tuple
+    beats: tuple[Beat, ...]
 
+    @property
+    def start_beat_idx(self) -> int:
+        if not self.beats:
+            return 0
+        beat_times = [b.time_ms for b in self.beats]
+        return int(np.searchsorted(beat_times, min(beat_times)))
 
-@dataclass(frozen=True)
-class Section:
-    idx: int
-    name: str
-    first_bar: int
-    end_bar: int
+    @property
+    def n_beats(self) -> int:
+        return len(self.beats)
 
-    def bar_count(self) -> int:
-        return self.end_bar - self.first_bar
-
-
-@dataclass(frozen=True)
-class Chord:
-    start_ms: float
-    end_ms: float
-    name: str
+    @property
+    def beat_numbers(self) -> tuple:
+        return tuple(b.position for b in self.beats)
 
 
 @dataclass
-class SongStructure:
-    beat_times_ms: np.ndarray = field(repr=False)
-    beat_numbers: np.ndarray = field(repr=False)
-    bars: list[Bar] = field(repr=False)
-    sections: list[Section] = field(repr=False)
-    bar_frames: np.ndarray | None = None
+class Section:
+    idx: int
+    name: str
+    bars: list[Bar]
+
+    def bar_count(self) -> int:
+        return len(self.bars)
+
+
+@dataclass
+class Arrangement:
+    name: str
+    master: bool
+    sections: list[Section]
+    beat_times_ms: np.ndarray = field(default_factory=lambda: np.array([], dtype=np.int64), repr=False)
+    beat_numbers: np.ndarray = field(default_factory=lambda: np.array([], dtype=int), repr=False)
+    bar_frames: np.ndarray | None = field(default=None, repr=False)
     total_frames: int = 0
-    chords: list[Chord] = field(default_factory=list)
-    beat_chords: list[str] = field(default_factory=list)
+
+    def reindex(self, sr: int):
+        beat_times = []
+        beat_numbers = []
+        for sec in self.sections:
+            for bar in sec.bars:
+                for beat in bar.beats:
+                    beat_times.append(beat.time_ms)
+                    beat_numbers.append(beat.position)
+
+        self.beat_times_ms = np.array(beat_times, dtype=np.int64)
+        self.beat_numbers = np.array(beat_numbers, dtype=int)
+
+    def set_bar_frames(self, sr: int, total_frames: int):
+        bars_flat = self.bars
+        frames = []
+        for bar in bars_flat:
+            if bar.beats:
+                frame = int(round(bar.beats[0].time_ms * sr / 1000))
+                frames.append(frame)
+        frames.append(total_frames)
+        self.bar_frames = np.array(frames, dtype=np.int64)
+        self.total_frames = total_frames
+
+    @property
+    def bars(self) -> list[Bar]:
+        result = []
+        for sec in self.sections:
+            result.extend(sec.bars)
+        return result
 
     def bar_at_frame(self, frame_idx: int) -> int:
+        if self.bar_frames is None:
+            return 0
         idx = int(np.searchsorted(self.bar_frames, frame_idx, side="right") - 1)
         return max(0, min(idx, len(self.bars) - 1))
 
     def bar_at_ms(self, ms: float) -> int:
+        if len(self.beat_times_ms) == 0:
+            return 0
         idx = int(np.searchsorted(self.beat_times_ms, ms, side="right") - 1)
         if idx < 0:
             return 0
-        for bar in self.bars:
-            if bar.start_beat_idx <= idx < bar.start_beat_idx + bar.n_beats:
-                return bar.idx
-        return len(self.bars) - 1
+        bars_flat = self.bars
+        beat_idx = 0
+        for bar_idx, bar in enumerate(bars_flat):
+            if beat_idx <= idx < beat_idx + len(bar.beats):
+                return bar_idx
+            beat_idx += len(bar.beats)
+        return len(bars_flat) - 1 if bars_flat else 0
 
     def next_bar_frame(self, bar_idx: int) -> int:
+        if self.bar_frames is None:
+            return 0
         return int(self.bar_frames[bar_idx + 1])
 
     def chord_at_beat(self, beat_idx: int) -> str:
-        if 0 <= beat_idx < len(self.beat_chords):
-            return self.beat_chords[beat_idx]
+        beat_count = 0
+        for bar in self.bars:
+            for beat in bar.beats:
+                if beat_count == beat_idx:
+                    return beat.chord
+                beat_count += 1
         return ""
 
-
-@dataclass(frozen=True)
-class ArrangementVersion:
-    name: str
-    section_ordering: list[tuple[int, int, int]]  # (source_sec_idx, source_first_bar, source_end_bar)
-
-
-@dataclass
-class ArrangementDocument:
-    source: SongStructure
-    versions: list[ArrangementVersion] = field(default_factory=list)
-    active_version_idx: int = 0
-    schema_version: int = 1
-
-    @property
-    def active_version(self) -> ArrangementVersion | None:
-        if not self.versions:
-            return None
-        return self.versions[self.active_version_idx]
-
-    def add_version(self, name: str) -> ArrangementVersion:
-        v = ArrangementVersion(
-            name=name,
-            section_ordering=[
-                (s.idx, s.first_bar, s.end_bar) for s in self.source.sections
-            ],
-        )
-        self.versions.append(v)
-        self.active_version_idx = len(self.versions) - 1
-        return v
-
-    def get_ordered_bars(self, version_idx: int | None = None) -> list[int]:
-        if version_idx is None:
-            version_idx = self.active_version_idx
-        if version_idx < 0 or version_idx >= len(self.versions):
-            return list(range(len(self.source.bars)))
-        version = self.versions[version_idx]
-        bars = []
-        for _, first_bar, end_bar in version.section_ordering:
-            bars.extend(range(first_bar, end_bar))
-        return bars
-
-
-@dataclass(frozen=True)
-class Command:
-    type: str
-    params: dict = field(default_factory=dict)
+    def clone(self) -> Arrangement:
+        return copy.deepcopy(self)

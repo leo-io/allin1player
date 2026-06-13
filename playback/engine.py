@@ -5,15 +5,15 @@ import numpy as np
 import sounddevice as sd
 import soundfile as sf
 
-from domain.models import SongStructure
+from domain.models import Arrangement
 from playback.state import TransportState
 
 
 class PlaybackEngine:
-    def __init__(self, audio_data: np.ndarray, song: SongStructure,
+    def __init__(self, audio_data: np.ndarray, arrangement: Arrangement,
                  state: TransportState, lock: threading.RLock, sr: int):
         self.audio_data = audio_data
-        self.song = song
+        self.arrangement = arrangement
         self.state = state
         self.lock = lock
         self.sr = sr
@@ -67,16 +67,16 @@ class PlaybackEngine:
         pos = self.state.frame_idx
 
         if self.state.loop_range is not None:
-            start = int(self.song.bar_frames[self.state.loop_range[0]])
-            end = int(self.song.bar_frames[self.state.loop_range[1]])
+            start = int(self.arrangement.bar_frames[self.state.loop_range[0]])
+            end = int(self.arrangement.bar_frames[self.state.loop_range[1]])
             if pos < end and start < end:
                 return end, start, False
 
         vq = self.state.vq
         if vq is not None and vq.active:
-            b = int(np.searchsorted(self.song.bar_frames, pos, side="right"))
-            if b < len(self.song.bar_frames):
-                return int(self.song.bar_frames[b]), None, True
+            b = int(np.searchsorted(self.arrangement.bar_frames, pos, side="right"))
+            if b < len(self.arrangement.bar_frames):
+                return int(self.arrangement.bar_frames[b]), None, True
 
         return None, None, False
 
@@ -107,17 +107,17 @@ class PlaybackEngine:
                         if next_bar is None:
                             if vq and vq.looping:
                                 vq.pos = 0
-                                target = int(self.song.bar_frames[vq.bars[0]])
+                                target = int(self.arrangement.bar_frames[vq.bars[0]])
                             else:
                                 resume = (vq.entry_bar + 1) if vq else 0
                                 self.state.vq = None
                                 self.state.dirty = True
-                                if resume < len(self.song.bars):
-                                    target = int(self.song.bar_frames[resume])
+                                if resume < len(self.arrangement.bars):
+                                    target = int(self.arrangement.bar_frames[resume])
                                 else:
                                     outdata[filled:] = 0
                                     raise sd.CallbackStop()
                         else:
-                            target = int(self.song.bar_frames[next_bar])
+                            target = int(self.arrangement.bar_frames[next_bar])
                         self.state.dirty = True
                     self.state.frame_idx = target
