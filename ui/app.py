@@ -30,6 +30,10 @@ class ArrangementEditor:
         self.engine = None
         self.renderer = None
 
+        # Audio cache: maps audiosource path -> (audio_data, sr)
+        self.audio_cache: dict[str, tuple[np.ndarray, int]] = {}
+        self.cache_lock = threading.RLock()
+
         self.audio_files = sorted(
             list(Path(".").glob("*.mp3")) + list(Path(".").glob("*.wav"))
         )
@@ -87,6 +91,77 @@ class ArrangementEditor:
         self.root.bind("<Control-s>", lambda e: self._cmd_save())
         self.root.bind("<Control-S>", lambda e: self._cmd_save())
 
+    # ------------------------------------------------------------------ audio loading
+
+    def _load_audio_by_source(self, audiosource: str) -> tuple[np.ndarray, int] | None:
+        """Load audio from the specified source file. Caches results for performance."""
+        logger.debug(f"[CHECKPOINT] Entering _load_audio_by_source() with audiosource={audiosource}")
+
+        if not audiosource:
+            logger.warning("Empty audiosource provided")
+            return None
+
+        # Check cache first
+        with self.cache_lock:
+            if audiosource in self.audio_cache:
+                logger.debug(f"Audio cache hit for {audiosource}")
+                return self.audio_cache[audiosource]
+
+        # Load from file
+        try:
+            source_path = Path(audiosource)
+            if not source_path.exists():
+                logger.error(f"[EXCEPTION] Audio source file not found: {source_path}")
+                return None
+
+            logger.debug(f"Loading audio from: {source_path}")
+            raw, sr = sf.read(str(source_path), always_2d=True)
+            logger.debug(f"Audio loaded: sr={sr}, shape={raw.shape}")
+
+            # Convert to mono if needed
+            if raw.shape[1] > 1:
+                logger.debug(f"Converting {raw.shape[1]} channels to mono")
+                raw = raw.mean(axis=1, keepdims=True)
+
+            audio_data = raw.astype(np.float32)
+            logger.debug(f"Audio preprocessed: {len(audio_data)} samples")
+
+            # Cache it
+            with self.cache_lock:
+                self.audio_cache[audiosource] = (audio_data, sr)
+                logger.debug(f"Audio cached for {audiosource}")
+
+            logger.debug(f"[CHECKPOINT] Exiting _load_audio_by_source() successfully")
+            return (audio_data, sr)
+
+        except Exception as e:
+            error_msg = f"Error loading audio from {audiosource}: {type(e).__name__}: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            return None
+
+    def _get_audio_for_bar(self, bar_idx: int) -> tuple[np.ndarray, int] | None:
+        """Get audio data for a specific bar by loading from its audiosource."""
+        logger.debug(f"[CHECKPOINT] Entering _get_audio_for_bar() with bar_idx={bar_idx}")
+
+        if self.arrangement is None:
+            logger.warning("No arrangement loaded")
+            return None
+
+        bars_flat = self.arrangement.bars
+        if bar_idx < 0 or bar_idx >= len(bars_flat):
+            logger.error(f"[EXCEPTION] Bar index out of range: {bar_idx}, total bars: {len(bars_flat)}")
+            return None
+
+        bar = bars_flat[bar_idx]
+        logger.debug(f"Bar {bar_idx} audiosource: {bar.audiosource}")
+
+        result = self._load_audio_by_source(bar.audiosource)
+        if result:
+            audio_data, sr = result
+            total_ms = len(audio_data) * 1000 / sr
+            logger.debug(f"[CHECKPOINT] Exiting _get_audio_for_bar() with audio: sr={sr}, duration={total_ms:.0f}ms")
+        return result
+
     # ------------------------------------------------------------------ commands
 
     def _cmd_save(self):
@@ -111,6 +186,9 @@ class ArrangementEditor:
     def load_file(self, audio_path, beats_path=None):
         logger.debug(f"[CHECKPOINT] Entering load_file() with audio_path={audio_path}")
         self.stop()
+        with self.cache_lock:
+            self.audio_cache.clear()
+        logger.debug("Audio cache cleared")
 
         p = Path(audio_path)
         if not p.exists():
@@ -121,48 +199,52 @@ class ArrangementEditor:
             logger.error(f"[EXCEPTION] Analysis file not found: {bp}")
             return
 
-        try:
-            logger.debug(f"Reading audio file: {p}")
-            raw, self.sr = sf.read(str(p), always_2d=True)
-            logger.debug(f"Audio loaded: sr={self.sr}, shape={raw.shape}")
-        except Exception as e:
-            import sys
-            error_msg = f"Could not decode {p.name}: {e}"
-            logger.error(f"[EXCEPTION] {error_msg}")
-            sys.stderr.write(
-                f"{error_msg}\n"
-                "MP3 support requires soundfile >= 0.12 (libsndfile >= 1.1): "
-                "pip install -U soundfile\n"
-            )
-            return
-
-        try:
-            if raw.shape[1] > 1:
-                logger.debug(f"Converting {raw.shape[1]} channels to mono")
-                raw = raw.mean(axis=1, keepdims=True)
-            self.audio_data = raw.astype(np.float32)
-            self.total_ms = len(self.audio_data) * 1000 / self.sr
-            logger.debug(f"Audio preprocessed: duration={self.total_ms:.0f}ms, samples={len(self.audio_data)}")
-        except Exception as e:
-            error_msg = f"Error preprocessing audio: {e}"
-            logger.error(f"[EXCEPTION] {error_msg}")
-            return
-
+        # Load arrangement first (contains audio sources in bars)
         try:
             logger.debug(f"[CHECKPOINT] Loading arrangement")
             self.arrangement = ArrangementStore.load_or_create(str(p), str(bp))
             logger.debug(f"[CHECKPOINT] Arrangement loaded: {self.arrangement.name}")
 
-            self.arrangement.reindex(self.sr)
-            logger.debug(f"[CHECKPOINT] Arrangement reindexed")
-
-            self.arrangement.set_bar_frames(self.sr, len(self.audio_data))
-            logger.debug(f"[CHECKPOINT] Bar frames set")
+            # Validate audio sources
+            self._validate_audio_sources()
         except Exception as e:
-            error_msg = f"Error loading/processing arrangement: {e}"
+            error_msg = f"Error loading arrangement: {e}"
             logger.error(f"[EXCEPTION] {error_msg}")
             return
 
+        # Load audio from first bar's audiosource
+        if not self.arrangement.bars:
+            logger.error("[EXCEPTION] Arrangement has no bars")
+            return
+
+        first_bar = self.arrangement.bars[0]
+        logger.debug(f"Loading audio from first bar's audiosource: {first_bar.audiosource}")
+
+        audio_result = self._load_audio_by_source(first_bar.audiosource)
+        if not audio_result:
+            error_msg = "Failed to load audio from bar audiosource"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            return
+
+        self.audio_data, self.sr = audio_result
+        self.total_ms = len(self.audio_data) * 1000 / self.sr
+        logger.info(f"Audio loaded: sr={self.sr}, duration={self.total_ms:.0f}ms, samples={len(self.audio_data)}")
+
+        # Process arrangement with loaded audio parameters
+        try:
+            logger.debug(f"[CHECKPOINT] Reindexing arrangement with sr={self.sr}")
+            self.arrangement.reindex(self.sr)
+            logger.debug(f"[CHECKPOINT] Arrangement reindexed")
+
+            logger.debug(f"[CHECKPOINT] Setting bar frames: total_frames={len(self.audio_data)}")
+            self.arrangement.set_bar_frames(self.sr, len(self.audio_data))
+            logger.debug(f"[CHECKPOINT] Bar frames set")
+        except Exception as e:
+            error_msg = f"Error processing arrangement: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            return
+
+        # Initialize playback engine and renderer
         try:
             with self.lock:
                 self.state = TransportState()
@@ -176,7 +258,7 @@ class ArrangementEditor:
             logger.error(f"[EXCEPTION] {error_msg}")
             return
 
-        # Determine which arrangement file was actually loaded
+        # Update UI labels
         try:
             master_p = ArrangementStore.master_path_for(p)
             user_p = ArrangementStore.arrangement_path_for(p)
@@ -215,11 +297,27 @@ class ArrangementEditor:
 
     # ------------------------------------------------------------------ event handlers
 
+    def _validate_audio_sources(self) -> bool:
+        """Validate that all bars reference consistent audio sources."""
+        logger.debug("[CHECKPOINT] Validating audio sources")
+        if not self.arrangement or not self.arrangement.bars:
+            return False
+
+        audio_sources = set(bar.audiosource for bar in self.arrangement.bars)
+        if len(audio_sources) > 1:
+            logger.warning(f"Multiple audio sources detected in arrangement: {audio_sources}")
+            logger.warning("Current playback engine supports single audio source per arrangement")
+
+        logger.debug(f"Audio sources validated: {len(audio_sources)} unique source(s)")
+        return True
+
     def _on_canvas_click(self, event):
+        logger.debug(f"[CHECKPOINT] Canvas click at x={event.x}, y={event.y}")
         cx, cy = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
         is_ctrl = bool(event.state & 0x4)
 
         if self.arrangement is None:
+            logger.warning("Canvas clicked but no arrangement loaded")
             return
 
         bar_idx = self.renderer.bar_at_xy(cx, cy)
