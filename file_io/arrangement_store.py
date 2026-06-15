@@ -70,6 +70,7 @@ class ArrangementStore:
             name=data.get("name", ""),
             master=data.get("master", False),
             sections=sections,
+            creationdate=data.get("creationdate", int(__import__("time").time() * 1000)),
         )
 
     @staticmethod
@@ -77,6 +78,7 @@ class ArrangementStore:
         data = {
             "name": arrangement.name,
             "master": arrangement.master,
+            "creationdate": arrangement.creationdate,
             "sections": [
                 {
                     "idx": sec.idx,

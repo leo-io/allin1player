@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 import copy
+import time
 import numpy as np
 
 
@@ -46,6 +47,7 @@ class Arrangement:
     name: str
     master: bool
     sections: list[Section]
+    creationdate: int = field(default_factory=lambda: int(time.time() * 1000))
     beat_times_ms: np.ndarray = field(default_factory=lambda: np.array([], dtype=np.int64), repr=False)
     beat_numbers: np.ndarray = field(default_factory=lambda: np.array([], dtype=int), repr=False)
     bar_frames: np.ndarray | None = field(default=None, repr=False)

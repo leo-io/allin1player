@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json
+import time
 from pathlib import Path
 import numpy as np
 
@@ -10,7 +11,7 @@ class Allin1Importer:
     @staticmethod
     def load(path: str | Path) -> Arrangement:
         raw = Allin1Importer._load_raw(path)
-        return Allin1Importer._flatten(raw)
+        return Allin1Importer._flatten(raw, path)
 
     @staticmethod
     def _load_raw(path: str | Path) -> dict:
@@ -55,7 +56,7 @@ class Allin1Importer:
         return sections
 
     @staticmethod
-    def _flatten(data: dict) -> Arrangement:
+    def _flatten(data: dict, path: str | Path) -> Arrangement:
         raw_bars = Allin1Importer._build_bar_list(data)
         sections_data = Allin1Importer._build_sections(data, raw_bars)
 
@@ -72,10 +73,12 @@ class Allin1Importer:
                 bar_idx += 1
             section_list.append(Section(idx=sec_idx, name=sec["name"], bars=bars))
 
+        file_id = Path(path).stem
         arrangement = Arrangement(
-            name="",
+            name=f"{file_id}-master",
             master=True,
             sections=section_list,
+            creationdate=int(time.time() * 1000),
         )
         arrangement.reindex(sr=1)
         return arrangement
