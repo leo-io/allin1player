@@ -24,3 +24,35 @@
 2026-06-15 02:24:51,718 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
 2026-06-15 02:24:51,719 [INFO] ui.app: Loaded master arrangement: music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json
 2026-06-15 02:24:51,728 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-15 02:37:49,212 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 02:37:49,213 [INFO] __main__: Audio file specified: .\music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:37:49,213 [INFO] __main__: Initializing editor with audio=music\20260613_014200-yolanda\20260613_014200-yolanda.wav, json=music\20260613_014200-yolanda\20260613_014200-yolanda.json
+2026-06-15 02:37:49,356 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:37:49,356 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:37:49,356 [INFO] file_io.arrangement_store: Master arrangement not found at music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json, will parse from allin1 analysis
+2026-06-15 02:37:49,356 [INFO] file_io.allin1_importer: [CHECKPOINT] Entering load() with path=music\20260613_014200-yolanda\20260613_014200-yolanda.json
+2026-06-15 02:37:49,356 [INFO] file_io.allin1_importer: Loading allin1 analysis JSON: music\20260613_014200-yolanda\20260613_014200-yolanda.json
+2026-06-15 02:37:49,359 [INFO] file_io.allin1_importer: Successfully created master arrangement '20260613_014200-yolanda-master' with 16 sections, 127 bars
+2026-06-15 02:37:49,359 [INFO] file_io.allin1_importer: [CHECKPOINT] Exiting load() successfully with arrangement name='20260613_014200-yolanda-master'
+2026-06-15 02:37:49,359 [INFO] file_io.arrangement_store: Saving master arrangement to: music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json
+2026-06-15 02:37:49,364 [INFO] file_io.arrangement_store: Saved arrangement: music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json (16 sections, 127 bars, 506 beats)
+2026-06-15 02:37:49,364 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-15 02:37:49,365 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-15 02:37:49,365 [ERROR] ui.app: [EXCEPTION] Audio source file not found: music\20260613_014200-yolanda\20260613_014200-yolanda.mp3
+2026-06-15 02:37:49,365 [ERROR] ui.app: [EXCEPTION] Failed to load audio from bar audiosource
+2026-06-15 02:40:11,186 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 02:40:11,187 [INFO] __main__: Audio file specified: .\music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:40:11,188 [INFO] __main__: Initializing editor with audio=music\20260613_014200-yolanda\20260613_014200-yolanda.wav, json=music\20260613_014200-yolanda\20260613_014200-yolanda.json
+2026-06-15 02:40:11,316 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:40:11,316 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:40:11,316 [INFO] file_io.arrangement_store: Master arrangement not found at music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json, will parse from allin1 analysis
+2026-06-15 02:40:11,316 [INFO] file_io.allin1_importer: [CHECKPOINT] Entering load() with path=music\20260613_014200-yolanda\20260613_014200-yolanda.json
+2026-06-15 02:40:11,316 [INFO] file_io.allin1_importer: Loading allin1 analysis JSON: music\20260613_014200-yolanda\20260613_014200-yolanda.json
+2026-06-15 02:40:11,319 [INFO] file_io.allin1_importer: Successfully created master arrangement '20260613_014200-yolanda-master' with 16 sections, 127 bars
+2026-06-15 02:40:11,319 [INFO] file_io.allin1_importer: [CHECKPOINT] Exiting load() successfully with arrangement name='20260613_014200-yolanda-master'
+2026-06-15 02:40:11,319 [INFO] file_io.arrangement_store: Saving master arrangement to: music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json
+2026-06-15 02:40:11,325 [INFO] file_io.arrangement_store: Saved arrangement: music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json (16 sections, 127 bars, 506 beats)
+2026-06-15 02:40:11,325 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-15 02:40:11,325 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-15 02:40:11,326 [ERROR] ui.app: [EXCEPTION] Audio source file not found: music\20260613_014200-yolanda\20260613_014200-yolanda.mp3
+2026-06-15 02:40:11,326 [ERROR] ui.app: [EXCEPTION] Failed to load audio from bar audiosource

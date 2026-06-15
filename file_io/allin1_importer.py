@@ -189,7 +189,7 @@ class Allin1Importer:
         logger.debug("[CHECKPOINT] Entering _flatten()")
         try:
             path = Path(path)
-            audio_source = str(path.with_suffix(".mp3"))
+            audio_source = str(path.with_suffix(".wav"))
             logger.debug(f"[CHECKPOINT] Audio source for bars: {audio_source}")
 
             raw_bars = Allin1Importer._build_bar_list(data)
