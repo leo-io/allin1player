@@ -59,3 +59,9 @@
 2026-06-15 02:48:45,800 [INFO] __main__: === Allin1 Arrangement Editor Started ===
 2026-06-15 02:48:45,800 [INFO] __main__: Arrangement file specified: .\music\20260612_221624-moment\20260612_221624-moment.json
 2026-06-15 02:48:45,801 [INFO] __main__: Initializing editor with arrangement=music\20260612_221624-moment\20260612_221624-moment.json
+2026-06-15 02:53:08,469 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 02:53:08,470 [INFO] __main__: File specified: .\music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 02:53:08,470 [INFO] __main__: WAV file specified, creating/loading arrangement: music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 02:54:27,133 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 02:54:27,134 [INFO] __main__: File specified: .\music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 02:54:27,134 [INFO] __main__: WAV file specified, creating/loading arrangement: music\20260612_221624-moment\20260612_221624-moment.wav
