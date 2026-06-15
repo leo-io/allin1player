@@ -1,8 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 import copy
+import logging
 import time
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -54,6 +57,7 @@ class Arrangement:
     total_frames: int = 0
 
     def reindex(self, sr: int):
+        logger.debug(f"Reindexing arrangement '{self.name}' (sr={sr})")
         beat_times = []
         beat_numbers = []
         for sec in self.sections:
@@ -64,8 +68,10 @@ class Arrangement:
 
         self.beat_times_ms = np.array(beat_times, dtype=np.int64)
         self.beat_numbers = np.array(beat_numbers, dtype=int)
+        logger.debug(f"Reindex complete: {len(beat_times)} beats indexed")
 
     def set_bar_frames(self, sr: int, total_frames: int):
+        logger.debug(f"Setting bar frames for '{self.name}': sr={sr}, total_frames={total_frames}")
         bars_flat = self.bars
         frames = []
         for bar in bars_flat:
@@ -75,6 +81,7 @@ class Arrangement:
         frames.append(total_frames)
         self.bar_frames = np.array(frames, dtype=np.int64)
         self.total_frames = total_frames
+        logger.debug(f"Bar frames set: {len(frames)} frame boundaries, duration={total_frames / sr:.2f}s")
 
     @property
     def bars(self) -> list[Bar]:
@@ -109,4 +116,7 @@ class Arrangement:
         return int(self.bar_frames[bar_idx + 1])
 
     def clone(self) -> Arrangement:
-        return copy.deepcopy(self)
+        logger.debug(f"Cloning arrangement '{self.name}'")
+        cloned = copy.deepcopy(self)
+        logger.debug(f"Clone created: {len(cloned.sections)} sections")
+        return cloned
