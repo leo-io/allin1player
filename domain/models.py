@@ -18,6 +18,7 @@ class Beat:
 class Bar:
     idx: int
     beats: tuple[Beat, ...]
+    audiosource: str = ""
 
     @property
     def start_beat_idx(self) -> int:

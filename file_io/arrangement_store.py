@@ -134,7 +134,11 @@ class ArrangementStore:
                                 )
                                 for beat in bar_data.get("beats", [])
                             )
-                            bars.append(Bar(idx=bar_data.get("idx", bar_idx), beats=beats))
+                            bars.append(Bar(
+                                idx=bar_data.get("idx", bar_idx),
+                                beats=beats,
+                                audiosource=bar_data.get("audiosource", "")
+                            ))
                             total_beats += len(beats)
                         except (KeyError, TypeError, ValueError) as e:
                             error_msg = f"Error creating Beat in section {sec_idx}, bar {bar_idx}: {e}"
@@ -199,6 +203,7 @@ class ArrangementStore:
                             "bars": [
                                 {
                                     "idx": bar.idx,
+                                    "audiosource": bar.audiosource,
                                     "beats": [
                                         {
                                             "time_ms": beat.time_ms,

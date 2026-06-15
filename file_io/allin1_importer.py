@@ -188,6 +188,10 @@ class Allin1Importer:
     def _flatten(data: dict, path: str | Path) -> Arrangement:
         logger.debug("[CHECKPOINT] Entering _flatten()")
         try:
+            path = Path(path)
+            audio_source = str(path.with_suffix(".mp3"))
+            logger.debug(f"[CHECKPOINT] Audio source for bars: {audio_source}")
+
             raw_bars = Allin1Importer._build_bar_list(data)
             logger.debug(f"[CHECKPOINT] Built bar list: {len(raw_bars)} bars")
 
@@ -207,7 +211,7 @@ class Allin1Importer:
                                 Beat(time_ms=beat["time_ms"], position=beat["beat"])
                                 for beat in bar_data
                             )
-                            bars.append(Bar(idx=bar_idx, beats=beats))
+                            bars.append(Bar(idx=bar_idx, beats=beats, audiosource=audio_source))
                             total_beats += len(beats)
                             bar_idx += 1
                         except (KeyError, TypeError) as e:
@@ -226,7 +230,7 @@ class Allin1Importer:
                     raise
 
             try:
-                file_id = Path(path).stem
+                file_id = path.stem
                 logger.debug(f"[CHECKPOINT] Creating master arrangement: file_id='{file_id}'")
                 arrangement = Arrangement(
                     name=f"{file_id}-master",

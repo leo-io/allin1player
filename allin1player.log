@@ -12,3 +12,15 @@
 2026-06-15 02:19:58,953 [INFO] file_io.arrangement_store: Saved arrangement: music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json (16 sections, 127 bars, 506 beats)
 2026-06-15 02:19:58,953 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
 2026-06-15 02:19:58,953 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-15 02:24:51,339 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 02:24:51,340 [INFO] __main__: Audio file specified: .\music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:24:51,340 [INFO] __main__: Initializing editor with audio=music\20260613_014200-yolanda\20260613_014200-yolanda.wav, json=music\20260613_014200-yolanda\20260613_014200-yolanda.json
+2026-06-15 02:24:51,714 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:24:51,714 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:24:51,714 [INFO] file_io.arrangement_store: Master arrangement file found: music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json
+2026-06-15 02:24:51,717 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260613_014200-yolanda-master', 127 bars, 506 beats, created=1781500798946
+2026-06-15 02:24:51,718 [INFO] file_io.arrangement_store: Loaded master arrangement '20260613_014200-yolanda-master' (created: 1781500798946)
+2026-06-15 02:24:51,718 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-15 02:24:51,718 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-15 02:24:51,719 [INFO] ui.app: Loaded master arrangement: music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json
+2026-06-15 02:24:51,728 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
