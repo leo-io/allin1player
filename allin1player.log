@@ -1,0 +1,14 @@
+2026-06-15 02:19:58,526 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 02:19:58,527 [INFO] __main__: Audio file specified: .\music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:19:58,527 [INFO] __main__: Initializing editor with audio=music\20260613_014200-yolanda\20260613_014200-yolanda.wav, json=music\20260613_014200-yolanda\20260613_014200-yolanda.json
+2026-06-15 02:19:58,938 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:19:58,938 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: music\20260613_014200-yolanda\20260613_014200-yolanda.wav
+2026-06-15 02:19:58,943 [INFO] file_io.arrangement_store: Master arrangement not found at music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json, will parse from allin1 analysis
+2026-06-15 02:19:58,943 [INFO] file_io.allin1_importer: [CHECKPOINT] Entering load() with path=music\20260613_014200-yolanda\20260613_014200-yolanda.json
+2026-06-15 02:19:58,943 [INFO] file_io.allin1_importer: Loading allin1 analysis JSON: music\20260613_014200-yolanda\20260613_014200-yolanda.json
+2026-06-15 02:19:58,946 [INFO] file_io.allin1_importer: Successfully created master arrangement '20260613_014200-yolanda-master' with 16 sections, 127 bars
+2026-06-15 02:19:58,946 [INFO] file_io.allin1_importer: [CHECKPOINT] Exiting load() successfully with arrangement name='20260613_014200-yolanda-master'
+2026-06-15 02:19:58,946 [INFO] file_io.arrangement_store: Saving master arrangement to: music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json
+2026-06-15 02:19:58,953 [INFO] file_io.arrangement_store: Saved arrangement: music\20260613_014200-yolanda\20260613_014200-yolanda.arrangement.master.json (16 sections, 127 bars, 506 beats)
+2026-06-15 02:19:58,953 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-15 02:19:58,953 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement

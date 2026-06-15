@@ -1,4 +1,5 @@
 from __future__ import annotations
+import logging
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -12,6 +13,8 @@ from file_io.arrangement_store import ArrangementStore
 from playback.engine import PlaybackEngine
 from playback.state import TransportState, VirtualQueue
 from ui.renderer import CanvasRenderer
+
+logger = logging.getLogger(__name__)
 
 
 class ArrangementEditor:
@@ -87,54 +90,128 @@ class ArrangementEditor:
     # ------------------------------------------------------------------ commands
 
     def _cmd_save(self):
+        logger.debug(f"[CHECKPOINT] Entering _cmd_save()")
         if self.arrangement is None or self.audio_path is None:
+            logger.warning("Cannot save: arrangement or audio_path is None")
             return
-        ArrangementStore.save(self.arrangement, self.audio_path)
-        self.state.dirty = False
+        try:
+            arrangement_p = ArrangementStore.arrangement_path_for(self.audio_path)
+            logger.info(f"Saving arrangement to: {arrangement_p}")
+            ArrangementStore.save(self.arrangement, self.audio_path)
+            self.state.dirty = False
+            logger.info(f"[CHECKPOINT] Save completed successfully")
+        except Exception as e:
+            error_msg = f"Error saving arrangement: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            import tkinter.messagebox as messagebox
+            messagebox.showerror("Save Error", error_msg)
 
     # ------------------------------------------------------------------ file loading
 
     def load_file(self, audio_path, beats_path=None):
+        logger.debug(f"[CHECKPOINT] Entering load_file() with audio_path={audio_path}")
         self.stop()
 
         p = Path(audio_path)
         if not p.exists():
+            logger.error(f"[EXCEPTION] Audio file not found: {p}")
             return
         bp = Path(beats_path) if beats_path else p.with_suffix(".json")
         if not bp.exists():
+            logger.error(f"[EXCEPTION] Analysis file not found: {bp}")
             return
 
         try:
+            logger.debug(f"Reading audio file: {p}")
             raw, self.sr = sf.read(str(p), always_2d=True)
+            logger.debug(f"Audio loaded: sr={self.sr}, shape={raw.shape}")
         except Exception as e:
             import sys
+            error_msg = f"Could not decode {p.name}: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
             sys.stderr.write(
-                f"Could not decode {p.name}: {e}\n"
+                f"{error_msg}\n"
                 "MP3 support requires soundfile >= 0.12 (libsndfile >= 1.1): "
                 "pip install -U soundfile\n"
             )
             return
-        if raw.shape[1] > 1:
-            raw = raw.mean(axis=1, keepdims=True)
-        self.audio_data = raw.astype(np.float32)
-        self.total_ms = len(self.audio_data) * 1000 / self.sr
 
-        self.arrangement = ArrangementStore.load_or_create(str(p), str(bp))
-        self.arrangement.reindex(self.sr)
-        self.arrangement.set_bar_frames(self.sr, len(self.audio_data))
+        try:
+            if raw.shape[1] > 1:
+                logger.debug(f"Converting {raw.shape[1]} channels to mono")
+                raw = raw.mean(axis=1, keepdims=True)
+            self.audio_data = raw.astype(np.float32)
+            self.total_ms = len(self.audio_data) * 1000 / self.sr
+            logger.debug(f"Audio preprocessed: duration={self.total_ms:.0f}ms, samples={len(self.audio_data)}")
+        except Exception as e:
+            error_msg = f"Error preprocessing audio: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            return
 
-        with self.lock:
-            self.state = TransportState()
+        try:
+            logger.debug(f"[CHECKPOINT] Loading arrangement")
+            self.arrangement = ArrangementStore.load_or_create(str(p), str(bp))
+            logger.debug(f"[CHECKPOINT] Arrangement loaded: {self.arrangement.name}")
 
-        self.engine = PlaybackEngine(self.audio_data, self.arrangement, self.state, self.lock, self.sr)
-        self.renderer = CanvasRenderer(self.canvas, self.arrangement)
+            self.arrangement.reindex(self.sr)
+            logger.debug(f"[CHECKPOINT] Arrangement reindexed")
 
-        self.audio_path = p
-        self.root.title(f"Arrangement Editor — {p.name}")
-        self.filename_label.config(text=p.name)
-        self.time_label.config(text=self._fmt(0))
+            self.arrangement.set_bar_frames(self.sr, len(self.audio_data))
+            logger.debug(f"[CHECKPOINT] Bar frames set")
+        except Exception as e:
+            error_msg = f"Error loading/processing arrangement: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            return
 
-        self.renderer.draw_all(self.state)
+        try:
+            with self.lock:
+                self.state = TransportState()
+
+            self.engine = PlaybackEngine(self.audio_data, self.arrangement, self.state, self.lock, self.sr)
+            self.renderer = CanvasRenderer(self.canvas, self.arrangement)
+            logger.debug(f"[CHECKPOINT] Engine and renderer initialized")
+
+        except Exception as e:
+            error_msg = f"Error initializing playback engine: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            return
+
+        # Determine which arrangement file was actually loaded
+        try:
+            master_p = ArrangementStore.master_path_for(p)
+            user_p = ArrangementStore.arrangement_path_for(p)
+
+            if self.arrangement.master and master_p.exists():
+                arrangement_file = master_p
+                label_text = f"{master_p.name} (master)"
+                logger.info(f"Loaded master arrangement: {master_p}")
+            elif user_p.exists():
+                arrangement_file = user_p
+                label_text = f"{user_p.name} (edits)"
+                logger.info(f"Loaded user arrangement: {user_p}")
+            else:
+                arrangement_file = master_p
+                label_text = f"{master_p.name} (generated)"
+                logger.info(f"Generated master arrangement: {master_p}")
+
+            self.audio_path = p
+            self.root.title(f"Arrangement Editor — {label_text}")
+            self.filename_label.config(text=label_text)
+            self.time_label.config(text=self._fmt(0))
+            logger.debug(f"[CHECKPOINT] UI updated: {label_text}")
+
+            self.renderer.draw_all(self.state)
+            logger.info(f"[CHECKPOINT] Exiting load_file() successfully")
+
+        except Exception as e:
+            error_msg = f"Error updating UI labels: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            # Still continue - the main loading succeeded
+            self.audio_path = p
+            self.root.title(f"Arrangement Editor")
+            self.filename_label.config(text=self.arrangement.name)
+            self.time_label.config(text=self._fmt(0))
+            self.renderer.draw_all(self.state)
 
     # ------------------------------------------------------------------ event handlers
 
