@@ -9,7 +9,6 @@ import soundfile as sf
 
 from domain.models import Arrangement
 from file_io.arrangement_store import ArrangementStore
-from file_io.chord_loader import ChordLoader
 from playback.engine import PlaybackEngine
 from playback.state import TransportState, VirtualQueue
 from ui.renderer import CanvasRenderer
@@ -27,7 +26,6 @@ class ArrangementEditor:
         self.arrangement: Arrangement | None = None
         self.engine = None
         self.renderer = None
-        self.show_chords = True
 
         self.audio_files = sorted(
             list(Path(".").glob("*.mp3")) + list(Path(".").glob("*.wav"))
@@ -66,14 +64,10 @@ class ArrangementEditor:
 
         file_menu = tk.Menu(self.menu_bar, tearoff=0, bg="#1a1a2e", fg="#e0e0e0")
         file_menu.add_command(label="Save", command=self._cmd_save)
-        file_menu.add_separator()
-        self.show_chords_var = tk.BooleanVar(value=True)
-        file_menu.add_checkbutton(label="Show Chords", variable=self.show_chords_var,
-                                  command=self._toggle_chords)
         self.menu_bar.add_cascade(label="File", menu=file_menu)
 
         cframe = tk.Frame(content, bg="#1a1a2e")
-        cframe.pack(fill="both", expand=True, padx=10, pady=(4, 0))
+        cframe.pack(fill="both", expand=True, padx=10, pady=(4, 14))
         self.canvas = tk.Canvas(cframe, bg="#16213e", highlightthickness=0)
         vbar = ttk.Scrollbar(cframe, orient="vertical", command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=vbar.set)
@@ -82,25 +76,11 @@ class ArrangementEditor:
         self.canvas.bind("<Configure>", self._on_resize)
         self.canvas.bind("<Button-1>", self._on_canvas_click)
 
-        ctrl = tk.Frame(content, bg="#1a1a2e")
-        ctrl.pack(pady=(10, 14))
-        self.play_btn = tk.Button(ctrl, text="Play", width=8, command=self.play)
-        self.play_btn.pack(side="left", padx=4)
-        self.pause_btn = tk.Button(ctrl, text="Pause", width=8, command=self.pause,
-                                   state="disabled")
-        self.pause_btn.pack(side="left", padx=4)
-        self.stop_btn = tk.Button(ctrl, text="Stop", width=8, command=self.stop,
-                                  state="disabled")
-        self.stop_btn.pack(side="left", padx=4)
-        tk.Button(ctrl, text="Quit", width=8, command=self.quit).pack(side="left", padx=4)
-
         self.root.protocol("WM_DELETE_WINDOW", self.quit)
         self.root.bind("<space>", lambda e: self.pause() if self.state.playing else self.play())
         self.root.bind("<Key-l>", lambda e: self._on_key("l"))
         self.root.bind("<Key-L>", lambda e: self._on_key("l"))
         self.root.bind("<Key-Escape>", lambda e: self._on_key("escape"))
-        self.root.bind("<Key-c>", lambda e: self._on_key("c"))
-        self.root.bind("<Key-C>", lambda e: self._on_key("c"))
         self.root.bind("<Control-s>", lambda e: self._cmd_save())
         self.root.bind("<Control-S>", lambda e: self._cmd_save())
 
@@ -111,11 +91,6 @@ class ArrangementEditor:
             return
         ArrangementStore.save(self.arrangement, self.audio_path)
         self.state.dirty = False
-
-    def _toggle_chords(self):
-        self.show_chords = self.show_chords_var.get()
-        if self.renderer is not None:
-            self.renderer.draw_all(self.state, self.show_chords)
 
     # ------------------------------------------------------------------ file loading
 
@@ -145,10 +120,6 @@ class ArrangementEditor:
         self.total_ms = len(self.audio_data) * 1000 / self.sr
 
         self.arrangement = ArrangementStore.load_or_create(str(p), str(bp))
-
-        cp = p.with_suffix(".madmom.chords.txt")
-        ChordLoader.assign_chords(self.arrangement, str(cp))
-
         self.arrangement.reindex(self.sr)
         self.arrangement.set_bar_frames(self.sr, len(self.audio_data))
 
@@ -162,11 +133,8 @@ class ArrangementEditor:
         self.root.title(f"Arrangement Editor — {p.name}")
         self.filename_label.config(text=p.name)
         self.time_label.config(text=self._fmt(0))
-        self.play_btn.config(state="normal", text="Play")
-        self.pause_btn.config(state="disabled", text="Pause")
-        self.stop_btn.config(state="disabled")
 
-        self.renderer.draw_all(self.state, self.show_chords)
+        self.renderer.draw_all(self.state)
 
     # ------------------------------------------------------------------ event handlers
 
@@ -191,7 +159,7 @@ class ArrangementEditor:
                     else:
                         self.state.vq.bars.append(bar_idx)
                     self.state.dirty = True
-                self.renderer.draw_all(self.state, self.show_chords)
+                self.renderer.draw_all(self.state)
             else:
                 self.state.selected = ("bar", bar_idx)
                 if self.state.playing:
@@ -203,17 +171,17 @@ class ArrangementEditor:
                             active=True,
                         )
                         self.state.dirty = True
-                self.renderer.draw_all(self.state, self.show_chords)
+                self.renderer.draw_all(self.state)
             return
 
         sec_idx = self.renderer.section_at_xy(cx, cy)
         if sec_idx is not None:
             self.state.selected = ("section", sec_idx)
-            self.renderer.draw_all(self.state, self.show_chords)
+            self.renderer.draw_all(self.state)
             return
 
         self.state.selected = None
-        self.renderer.draw_all(self.state, self.show_chords)
+        self.renderer.draw_all(self.state)
 
     def _on_key(self, key):
         if key == "l":
@@ -222,7 +190,7 @@ class ArrangementEditor:
                 with self.lock:
                     vq.looping = not vq.looping
                     self.state.dirty = True
-                self.renderer.draw_all(self.state, self.show_chords)
+                self.renderer.draw_all(self.state)
                 return
             if self.state.selected and self.arrangement is not None:
                 bars_flat = self.arrangement.bars
@@ -239,21 +207,18 @@ class ArrangementEditor:
                     else:
                         return
                     self.state.loop_range = None if self.state.loop_range == target_range else target_range
-                self.renderer.draw_all(self.state, self.show_chords)
-        elif key == "c":
-            self.show_chords_var.set(not self.show_chords_var.get())
-            self._toggle_chords()
+                self.renderer.draw_all(self.state)
         elif key == "escape":
             with self.lock:
                 self.state.vq = None
                 self.state.dirty = True
             if self.arrangement is not None:
-                self.renderer.draw_all(self.state, self.show_chords)
+                self.renderer.draw_all(self.state)
 
     def _on_resize(self, event):
         if self.arrangement is None or self.renderer is None:
             return
-        self.renderer.draw_all(self.state, self.show_chords)
+        self.renderer.draw_all(self.state)
 
     # ------------------------------------------------------------------ utilities
 
@@ -282,7 +247,7 @@ class ArrangementEditor:
             self.root.after_idle(self._playback_finished)
             return
         if dirty:
-            self.renderer.draw_all(self.state, self.show_chords)
+            self.renderer.draw_all(self.state)
         self.renderer.update_playhead(frame_idx, pos, self.state)
         self.time_label.config(text=self._time_str(min(pos, int(self.total_ms))))
         self.root.after(50, self._poll)
@@ -290,12 +255,9 @@ class ArrangementEditor:
     def _playback_finished(self):
         if self.engine is not None:
             self.engine.stop()
-        self.play_btn.config(state="normal", text="Play")
-        self.pause_btn.config(state="disabled", text="Pause")
-        self.stop_btn.config(state="disabled")
         self.time_label.config(text=self._fmt(0))
         if self.renderer:
-            self.renderer.draw_all(self.state, self.show_chords)
+            self.renderer.draw_all(self.state)
 
     # ------------------------------------------------------------------ playback controls
 
@@ -304,16 +266,12 @@ class ArrangementEditor:
             return
         if self.state.paused:
             self.engine.pause()
-            self.pause_btn.config(text="Pause")
             self.root.after(50, self._poll)
             return
         self.engine.stop()
         with self.lock:
             self.state.frame_idx = 0
         self.engine.play()
-        self.play_btn.config(state="disabled")
-        self.pause_btn.config(state="normal", text="Pause")
-        self.stop_btn.config(state="normal")
         self.root.after(50, self._poll)
 
     def pause(self):
@@ -322,16 +280,9 @@ class ArrangementEditor:
             with self.lock:
                 self.state.frame_idx = 0
             self.engine.play()
-            self.play_btn.config(state="disabled")
-            self.pause_btn.config(state="normal", text="Pause")
-            self.stop_btn.config(state="normal")
             self.root.after(50, self._poll)
             return
         self.engine.pause()
-        if self.state.paused:
-            self.pause_btn.config(text="Resume")
-        else:
-            self.pause_btn.config(text="Pause")
 
     def stop(self):
         if self.engine is not None:

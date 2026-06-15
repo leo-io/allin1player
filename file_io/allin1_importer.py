@@ -65,7 +65,7 @@ class Allin1Importer:
             bars = []
             for bar_data in sec["bars"]:
                 beats = tuple(
-                    Beat(time_ms=beat["time_ms"], position=beat["beat"], chord="")
+                    Beat(time_ms=beat["time_ms"], position=beat["beat"])
                     for beat in bar_data
                 )
                 bars.append(Bar(idx=bar_idx, beats=beats))

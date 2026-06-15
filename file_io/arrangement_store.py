@@ -9,7 +9,12 @@ class ArrangementStore:
     @staticmethod
     def arrangement_path_for(audio_path: str | Path) -> Path:
         p = Path(audio_path)
-        return p.with_suffix(".allin1player.json")
+        return p.with_stem(p.stem + ".arrangement").with_suffix(".json")
+
+    @staticmethod
+    def master_path_for(audio_path: str | Path) -> Path:
+        p = Path(audio_path)
+        return p.with_stem(p.stem + ".arrangement.master").with_suffix(".json")
 
     @staticmethod
     def load_or_create(
@@ -19,12 +24,18 @@ class ArrangementStore:
         from file_io.allin1_importer import Allin1Importer
 
         audio_p = Path(audio_path)
+        master_p = ArrangementStore.master_path_for(audio_p)
 
-        if analysis_path is None:
-            analysis_path = audio_p.with_suffix(".json")
-        analysis_p = Path(analysis_path)
+        if master_p.exists():
+            master = ArrangementStore._load(str(master_p))
+            master.master = True
+        else:
+            if analysis_path is None:
+                analysis_path = audio_p.with_suffix(".json")
+            analysis_p = Path(analysis_path)
+            master = Allin1Importer.load(str(analysis_p))
+            ArrangementStore._save_to_path(master, str(master_p))
 
-        master = Allin1Importer.load(str(analysis_p))
         arrangement_p = ArrangementStore.arrangement_path_for(audio_p)
 
         if arrangement_p.exists():
@@ -45,7 +56,6 @@ class ArrangementStore:
                     Beat(
                         time_ms=beat["time_ms"],
                         position=beat["position"],
-                        chord=beat.get("chord", ""),
                     )
                     for beat in bar_data.get("beats", [])
                 )
@@ -63,8 +73,7 @@ class ArrangementStore:
         )
 
     @staticmethod
-    def save(arrangement: Arrangement, audio_path: str | Path) -> None:
-        arrangement_p = ArrangementStore.arrangement_path_for(audio_path)
+    def _save_to_path(arrangement: Arrangement, path: str) -> None:
         data = {
             "name": arrangement.name,
             "master": arrangement.master,
@@ -79,7 +88,6 @@ class ArrangementStore:
                                 {
                                     "time_ms": beat.time_ms,
                                     "position": beat.position,
-                                    "chord": beat.chord,
                                 }
                                 for beat in bar.beats
                             ],
@@ -90,5 +98,10 @@ class ArrangementStore:
                 for sec in arrangement.sections
             ],
         }
-        with open(arrangement_p, "w") as f:
+        with open(path, "w") as f:
             json.dump(data, f, indent=2)
+
+    @staticmethod
+    def save(arrangement: Arrangement, audio_path: str | Path) -> None:
+        arrangement_p = ArrangementStore.arrangement_path_for(audio_path)
+        ArrangementStore._save_to_path(arrangement, str(arrangement_p))

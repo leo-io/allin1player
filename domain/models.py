@@ -8,7 +8,6 @@ import numpy as np
 class Beat:
     time_ms: int
     position: int
-    chord: str = ""
 
 
 @dataclass(frozen=True)
@@ -106,15 +105,6 @@ class Arrangement:
         if self.bar_frames is None:
             return 0
         return int(self.bar_frames[bar_idx + 1])
-
-    def chord_at_beat(self, beat_idx: int) -> str:
-        beat_count = 0
-        for bar in self.bars:
-            for beat in bar.beats:
-                if beat_count == beat_idx:
-                    return beat.chord
-                beat_count += 1
-        return ""
 
     def clone(self) -> Arrangement:
         return copy.deepcopy(self)

@@ -67,7 +67,7 @@ class CanvasRenderer:
             return ""
         return "".join(f"[{p}]" for p in positions)
 
-    def draw_all(self, state: TransportState, show_chords: bool = True):
+    def draw_all(self, state: TransportState):
         self.canvas.delete("all")
         self.bar_items = []
         self.section_items = []
@@ -124,7 +124,6 @@ class CanvasRenderer:
                     )
 
                     beat_rects = []
-                    show_chord_labels = show_chords
                     vq = state.vq
                     for bii, beat in enumerate(bar.beats):
                         bx = rx + 1 + bii * beat_w
@@ -139,11 +138,6 @@ class CanvasRenderer:
 
                         t = None
                         if beat_w >= 14:
-                            chord = beat.chord
-                            prev_beat = bar.beats[bii - 1] if bii > 0 else None
-                            prev_chord = prev_beat.chord if prev_beat else ""
-                            is_chord_change = show_chord_labels and chord and chord != "N" and chord != prev_chord
-
                             if vq is not None and bii == nb - 1 and bar_idx in vq.bars:
                                 label = self._queue_label(bar_idx, vq)
                                 if label:
@@ -151,13 +145,7 @@ class CanvasRenderer:
                                         bx + bw2 // 2, ry + 2 + bh // 2,
                                         text=label, fill="#ddd", font=("Segoe UI", 7),
                                     )
-                            elif is_chord_change:
-                                t = self.canvas.create_text(
-                                    bx + bw2 // 2, ry + 2 + bh // 2,
-                                    text=chord, fill="#8af",
-                                    font=("Segoe UI", 9),
-                                )
-                            elif is_db and not show_chord_labels:
+                            elif is_db:
                                 bar_num = len(sec.bars[:row_offset]) + row_bars.index(bar) + 1
                                 t = self.canvas.create_text(
                                     bx + bw2 // 2, ry + 2 + bh // 2,
