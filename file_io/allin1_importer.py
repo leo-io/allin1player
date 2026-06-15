@@ -14,118 +14,236 @@ class Allin1Importer:
     @staticmethod
     def load(path: str | Path) -> Arrangement:
         path = Path(path)
-        logger.info(f"Loading allin1 analysis JSON: {path}")
+        logger.info(f"[CHECKPOINT] Entering load() with path={path}")
         try:
+            logger.info(f"Loading allin1 analysis JSON: {path}")
             raw = Allin1Importer._load_raw(path)
-            logger.debug(f"Loaded raw data with {len(raw.get('beats', []))} beats, {len(raw.get('segments', []))} segments")
+            logger.debug(f"[CHECKPOINT] Raw JSON loaded: beats={len(raw.get('beats', []))}, segments={len(raw.get('segments', []))}")
+
             arrangement = Allin1Importer._flatten(raw, path)
             logger.info(f"Successfully created master arrangement '{arrangement.name}' with {len(arrangement.sections)} sections, {len(arrangement.bars)} bars")
+            logger.info(f"[CHECKPOINT] Exiting load() successfully with arrangement name='{arrangement.name}'")
             return arrangement
+        except FileNotFoundError as e:
+            error_msg = f"Allin1 analysis file not found: {path}"
+            logger.error(f"[EXCEPTION] {error_msg} | Details: {e}")
+            raise FileNotFoundError(error_msg) from e
+        except json.JSONDecodeError as e:
+            error_msg = f"Invalid JSON format in allin1 analysis {path} at line {e.lineno}, col {e.colno}: {e.msg}"
+            logger.error(f"[EXCEPTION] {error_msg} | Details: {e}")
+            raise ValueError(error_msg) from e
+        except KeyError as e:
+            error_msg = f"Missing required field in allin1 JSON: {e}"
+            logger.error(f"[EXCEPTION] {error_msg} | Details: {e}")
+            raise ValueError(error_msg) from e
         except Exception as e:
-            logger.error(f"Failed to load allin1 analysis from {path}: {e}", exc_info=True)
+            error_msg = f"Unexpected error loading allin1 analysis from {path}: {type(e).__name__}: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}", exc_info=True)
             raise
 
     @staticmethod
     def _load_raw(path: str | Path) -> dict:
         path = Path(path)
-        logger.debug(f"Reading JSON file: {path}")
+        logger.debug(f"[CHECKPOINT] Entering _load_raw() with path={path}")
         try:
-            with open(path) as f:
+            logger.debug(f"Reading JSON file: {path}")
+            if not path.exists():
+                raise FileNotFoundError(f"File does not exist: {path}")
+
+            file_size = path.stat().st_size
+            logger.debug(f"File size: {file_size} bytes")
+
+            with open(path, encoding='utf-8') as f:
                 data = json.load(f)
-            logger.debug(f"Successfully parsed JSON, file size info: beats={len(data.get('beats', []))}, beat_positions={len(data.get('beat_positions', []))}, segments={len(data.get('segments', []))}")
+
+            beats_count = len(data.get('beats', []))
+            beat_positions_count = len(data.get('beat_positions', []))
+            segments_count = len(data.get('segments', []))
+            logger.debug(f"[CHECKPOINT] JSON parsed: beats={beats_count}, beat_positions={beat_positions_count}, segments={segments_count}")
+
+            if beats_count != beat_positions_count:
+                logger.warning(f"Data mismatch: beats ({beats_count}) != beat_positions ({beat_positions_count})")
+
+            logger.debug(f"[CHECKPOINT] Exiting _load_raw() successfully")
             return data
         except FileNotFoundError as e:
-            logger.error(f"Analysis file not found: {path}")
-            raise
+            error_msg = f"Analysis file not found: {path}"
+            logger.error(f"[EXCEPTION] {error_msg} | Details: {e}")
+            raise FileNotFoundError(error_msg) from e
         except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON in {path}: {e}")
+            error_msg = f"Invalid JSON in {path} (line {e.lineno}, col {e.colno}): {e.msg}"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            raise ValueError(error_msg) from e
+        except IOError as e:
+            error_msg = f"IO error reading {path}: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            raise IOError(error_msg) from e
+        except Exception as e:
+            error_msg = f"Unexpected error in _load_raw(): {type(e).__name__}: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}", exc_info=True)
             raise
 
     @staticmethod
     def _build_bar_list(data: dict) -> list[list[dict]]:
-        logger.debug("Building bar list from beats and beat_positions")
-        all_bars = []
-        current = []
-        beats_count = len(data.get("beats", []))
-        logger.debug(f"Processing {beats_count} beats")
+        logger.debug("[CHECKPOINT] Entering _build_bar_list()")
+        try:
+            all_bars = []
+            current = []
+            beats_count = len(data.get("beats", []))
+            beat_positions_count = len(data.get("beat_positions", []))
+            logger.debug(f"Processing {beats_count} beats, {beat_positions_count} beat_positions")
 
-        for t, num in zip(data.get("beats", []), data.get("beat_positions", [])):
-            if num == 1 and current:
+            if beats_count == 0 or beat_positions_count == 0:
+                logger.warning("No beats or beat_positions data found")
+                logger.debug("[CHECKPOINT] Exiting _build_bar_list() with empty result")
+                return all_bars
+
+            for idx, (t, num) in enumerate(zip(data.get("beats", []), data.get("beat_positions", []))):
+                try:
+                    time_ms = int(round(float(t) * 1000))
+                    beat_num = int(num)
+                    if beat_num == 1 and current:
+                        all_bars.append(current)
+                        current = []
+                    current.append({"time_ms": time_ms, "beat": beat_num})
+                except (ValueError, TypeError) as e:
+                    error_msg = f"Invalid beat data at index {idx}: time={t}, position={num}"
+                    logger.error(f"[EXCEPTION] {error_msg} | Error: {e}")
+                    raise ValueError(error_msg) from e
+
+            if current:
                 all_bars.append(current)
-                current = []
-            current.append({"time_ms": int(round(t * 1000)), "beat": int(num)})
-        if current:
-            all_bars.append(current)
 
-        logger.debug(f"Built {len(all_bars)} bars from {beats_count} beats")
-        return all_bars
+            logger.debug(f"[CHECKPOINT] Built {len(all_bars)} bars from {beats_count} beats")
+            logger.debug(f"[CHECKPOINT] Exiting _build_bar_list() with {len(all_bars)} bars")
+            return all_bars
+        except Exception as e:
+            error_msg = f"Error building bar list: {type(e).__name__}: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
+            raise
 
     @staticmethod
     def _build_sections(data: dict, all_bars: list[list[dict]]) -> list[dict]:
-        logger.debug(f"Building sections from {len(data.get('segments', []))} segments and {len(all_bars)} bars")
-        sections = []
-        label_counts = {}
-        segment_count = 0
+        logger.debug(f"[CHECKPOINT] Entering _build_sections() with {len(data.get('segments', []))} segments, {len(all_bars)} bars")
+        try:
+            sections = []
+            label_counts = {}
+            segments = data.get("segments", [])
 
-        for seg in data.get("segments", []):
-            seg_start_ms = seg["start"] * 1000
-            seg_end_ms = seg["end"] * 1000
-            seg_bars = [b for b in all_bars if seg_start_ms <= b[0]["time_ms"] < seg_end_ms]
-            if not seg_bars:
-                logger.debug(f"Segment '{seg.get('label', 'unknown')}' ({seg['start']:.2f}s-{seg['end']:.2f}s) has no bars, skipping")
-                continue
-            label = seg["label"]
-            label_counts[label] = label_counts.get(label, 0) + 1
-            section_name = f"{label} {label_counts[label]}"
-            sections.append({"name": section_name, "bars": seg_bars})
-            logger.debug(f"Created section '{section_name}' with {len(seg_bars)} bars")
-            segment_count += 1
+            if not segments:
+                logger.warning("No segments found in data")
 
-        if not sections and all_bars:
-            logger.warning(f"No sections found from segments, creating default 'track' section with {len(all_bars)} bars")
-            sections = [{"name": "track", "bars": all_bars}]
+            for seg_idx, seg in enumerate(segments):
+                try:
+                    seg_start = seg.get("start")
+                    seg_end = seg.get("end")
+                    label = seg.get("label", "unknown")
 
-        for sec in sections:
-            label = sec["name"].rsplit(" ", 1)[0]
-            if label_counts.get(label, 0) == 1:
-                old_name = sec["name"]
-                sec["name"] = label
-                logger.debug(f"Renamed section '{old_name}' → '{label}' (only occurrence)")
+                    if seg_start is None or seg_end is None:
+                        error_msg = f"Segment {seg_idx} missing start/end: start={seg_start}, end={seg_end}"
+                        logger.warning(f"[EXCEPTION] {error_msg}")
+                        continue
 
-        logger.debug(f"Section building complete: {len(sections)} sections")
-        return sections
+                    seg_start_ms = float(seg_start) * 1000
+                    seg_end_ms = float(seg_end) * 1000
+                    seg_bars = [b for b in all_bars if seg_start_ms <= b[0]["time_ms"] < seg_end_ms]
+
+                    if not seg_bars:
+                        logger.debug(f"Segment '{label}' ({seg_start:.2f}s-{seg_end:.2f}s) has no bars, skipping")
+                        continue
+
+                    label_counts[label] = label_counts.get(label, 0) + 1
+                    section_name = f"{label} {label_counts[label]}"
+                    sections.append({"name": section_name, "bars": seg_bars})
+                    logger.debug(f"Created section '{section_name}' with {len(seg_bars)} bars (seg {seg_idx})")
+
+                except (KeyError, TypeError, ValueError) as e:
+                    error_msg = f"Error processing segment {seg_idx}: {e}"
+                    logger.error(f"[EXCEPTION] {error_msg}")
+                    continue
+
+            if not sections and all_bars:
+                logger.warning(f"No sections found from segments, creating default 'track' section with {len(all_bars)} bars")
+                sections = [{"name": "track", "bars": all_bars}]
+
+            for sec in sections:
+                try:
+                    label = sec["name"].rsplit(" ", 1)[0]
+                    if label_counts.get(label, 0) == 1:
+                        old_name = sec["name"]
+                        sec["name"] = label
+                        logger.debug(f"Renamed section '{old_name}' → '{label}' (only occurrence)")
+                except Exception as e:
+                    logger.error(f"[EXCEPTION] Error deduplicating section name: {e}")
+
+            logger.debug(f"[CHECKPOINT] Section building complete: {len(sections)} sections created")
+            logger.debug(f"[CHECKPOINT] Exiting _build_sections()")
+            return sections
+        except Exception as e:
+            error_msg = f"Unexpected error in _build_sections(): {type(e).__name__}: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}", exc_info=True)
+            raise
 
     @staticmethod
     def _flatten(data: dict, path: str | Path) -> Arrangement:
-        logger.debug("Flattening raw data into domain objects")
-        raw_bars = Allin1Importer._build_bar_list(data)
-        sections_data = Allin1Importer._build_sections(data, raw_bars)
+        logger.debug("[CHECKPOINT] Entering _flatten()")
+        try:
+            raw_bars = Allin1Importer._build_bar_list(data)
+            logger.debug(f"[CHECKPOINT] Built bar list: {len(raw_bars)} bars")
 
-        section_list = []
-        bar_idx = 0
-        total_beats = 0
+            sections_data = Allin1Importer._build_sections(data, raw_bars)
+            logger.debug(f"[CHECKPOINT] Built sections: {len(sections_data)} sections")
 
-        for sec_idx, sec in enumerate(sections_data):
-            bars = []
-            for bar_data in sec["bars"]:
-                beats = tuple(
-                    Beat(time_ms=beat["time_ms"], position=beat["beat"])
-                    for beat in bar_data
+            section_list = []
+            bar_idx = 0
+            total_beats = 0
+
+            for sec_idx, sec in enumerate(sections_data):
+                try:
+                    bars = []
+                    for bar_data in sec.get("bars", []):
+                        try:
+                            beats = tuple(
+                                Beat(time_ms=beat["time_ms"], position=beat["beat"])
+                                for beat in bar_data
+                            )
+                            bars.append(Bar(idx=bar_idx, beats=beats))
+                            total_beats += len(beats)
+                            bar_idx += 1
+                        except (KeyError, TypeError) as e:
+                            error_msg = f"Error creating Beat in section {sec_idx}: {e}"
+                            logger.error(f"[EXCEPTION] {error_msg} | bar_data={bar_data}")
+                            raise ValueError(error_msg) from e
+
+                    section = Section(idx=sec_idx, name=sec.get("name", f"section_{sec_idx}"), bars=bars)
+                    section_list.append(section)
+                    section_beats = sum(len(b.beats) for b in bars)
+                    logger.debug(f"[CHECKPOINT] Section {sec_idx} '{section.name}': {len(bars)} bars, {section_beats} beats")
+
+                except Exception as e:
+                    error_msg = f"Error flattening section {sec_idx}: {type(e).__name__}: {e}"
+                    logger.error(f"[EXCEPTION] {error_msg}")
+                    raise
+
+            try:
+                file_id = Path(path).stem
+                logger.debug(f"[CHECKPOINT] Creating master arrangement: file_id='{file_id}'")
+                arrangement = Arrangement(
+                    name=f"{file_id}-master",
+                    master=True,
+                    sections=section_list,
+                    creationdate=int(time.time() * 1000),
                 )
-                bars.append(Bar(idx=bar_idx, beats=beats))
-                total_beats += len(beats)
-                bar_idx += 1
-            section_list.append(Section(idx=sec_idx, name=sec["name"], bars=bars))
-            logger.debug(f"Section {sec_idx} '{sec['name']}': {len(bars)} bars, {sum(len(b.beats) for b in bars)} beats")
+                arrangement.reindex(sr=1)
+                logger.debug(f"[CHECKPOINT] Arrangement created and reindexed: {len(section_list)} sections, {bar_idx} bars, {total_beats} beats")
+                logger.debug(f"[CHECKPOINT] Exiting _flatten() successfully")
+                return arrangement
+            except Exception as e:
+                error_msg = f"Error creating Arrangement object: {type(e).__name__}: {e}"
+                logger.error(f"[EXCEPTION] {error_msg}")
+                raise
 
-        file_id = Path(path).stem
-        logger.debug(f"Creating master arrangement with file_id='{file_id}'")
-        arrangement = Arrangement(
-            name=f"{file_id}-master",
-            master=True,
-            sections=section_list,
-            creationdate=int(time.time() * 1000),
-        )
-        arrangement.reindex(sr=1)
-        logger.debug(f"Arrangement flattened: {len(section_list)} sections, {bar_idx} bars, {total_beats} beats")
-        return arrangement
+        except Exception as e:
+            error_msg = f"Unexpected error in _flatten(): {type(e).__name__}: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}", exc_info=True)
+            raise
