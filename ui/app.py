@@ -38,7 +38,18 @@ class ArrangementEditor:
         if arrangement_path:
             self.load_file(arrangement_path)
         elif self.audio_files:
-            self.load_file(str(self.audio_files[0]))
+            # Try to load arrangement for first WAV file
+            first_wav = self.audio_files[0]
+            arrangement_p = ArrangementStore.arrangement_path_for(first_wav)
+            if arrangement_p.exists():
+                self.load_file(str(arrangement_p))
+            else:
+                # Try to create from analysis JSON
+                analysis_p = first_wav.with_suffix(".json")
+                if analysis_p.exists():
+                    self.create_and_load_arrangement(str(first_wav), str(analysis_p))
+                else:
+                    logger.warning(f"No arrangement or analysis file found for {first_wav}")
 
     def _build_ui(self):
         self.root = tk.Tk()
@@ -85,6 +96,35 @@ class ArrangementEditor:
         self.root.bind("<Key-Escape>", lambda e: self._on_key("escape"))
         self.root.bind("<Control-s>", lambda e: self._cmd_save())
         self.root.bind("<Control-S>", lambda e: self._cmd_save())
+
+    # ------------------------------------------------------------------ file loading
+
+    def create_and_load_arrangement(self, audio_path: str, analysis_path: str):
+        """Create arrangement from analysis JSON and load it."""
+        logger.debug(f"[CHECKPOINT] Entering create_and_load_arrangement()")
+        logger.info(f"Creating arrangement from analysis: {analysis_path}")
+
+        try:
+            audio_p = Path(audio_path)
+            analysis_p = Path(analysis_path)
+
+            # Load or create arrangement
+            logger.debug("Loading arrangement via ArrangementStore.load_or_create()")
+            arrangement = ArrangementStore.load_or_create(str(audio_p), str(analysis_p))
+
+            # Save as master
+            master_p = ArrangementStore.master_path_for(audio_p)
+            logger.info(f"Saving master arrangement to: {master_p}")
+            ArrangementStore._save_to_path(arrangement, str(master_p))
+            logger.debug(f"[CHECKPOINT] Master arrangement saved")
+
+            # Now load the created master file
+            logger.debug(f"Loading created master arrangement")
+            self.load_file(str(master_p))
+
+        except Exception as e:
+            error_msg = f"Error creating arrangement from analysis: {type(e).__name__}: {e}"
+            logger.error(f"[EXCEPTION] {error_msg}")
 
     # ------------------------------------------------------------------ audio loading
 

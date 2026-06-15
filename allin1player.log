@@ -56,3 +56,6 @@
 2026-06-15 02:40:11,325 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
 2026-06-15 02:40:11,326 [ERROR] ui.app: [EXCEPTION] Audio source file not found: music\20260613_014200-yolanda\20260613_014200-yolanda.mp3
 2026-06-15 02:40:11,326 [ERROR] ui.app: [EXCEPTION] Failed to load audio from bar audiosource
+2026-06-15 02:48:45,800 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 02:48:45,800 [INFO] __main__: Arrangement file specified: .\music\20260612_221624-moment\20260612_221624-moment.json
+2026-06-15 02:48:45,801 [INFO] __main__: Initializing editor with arrangement=music\20260612_221624-moment\20260612_221624-moment.json
