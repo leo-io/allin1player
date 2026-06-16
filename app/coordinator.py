@@ -6,3 +6,9 @@ from ui.app import ArrangementEditor
 
 def create_editor(arrangement_path: str | None = None) -> ArrangementEditor:
     return ArrangementEditor(arrangement_path=arrangement_path)
+
+
+def create_mix_editor(mix_path: str | None = None):
+    from ui.mix_app import MixEditor
+
+    return MixEditor(mix_path=mix_path)

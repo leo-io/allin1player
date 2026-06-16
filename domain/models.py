@@ -245,3 +245,19 @@ class Arrangement:
             error_msg = f"Unexpected error in clone(): {type(e).__name__}: {e}"
             logger.error(f"[EXCEPTION] {error_msg}", exc_info=True)
             raise
+
+
+@dataclass
+class Mix:
+    """A higher-level arrangement of whole sections (the "mix-sections").
+
+    Each entry is a full Section (with its bars/beats/audiosource embedded), so a
+    Mix is self-contained. Unlike Arrangement, a Mix carries no beat/frame arrays
+    because it is edited and rendered at the section-block level only.
+    """
+    name: str
+    sections: list[Section] = field(default_factory=list)
+    creationdate: int = field(default_factory=lambda: int(time.time() * 1000))
+
+    def clone(self) -> Mix:
+        return copy.deepcopy(self)
