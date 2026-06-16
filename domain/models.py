@@ -157,6 +157,31 @@ class Arrangement:
             result.extend(sec.bars)
         return result
 
+    def source_bounds(self, sr: int) -> np.ndarray:
+        """Sorted unique source-frame start positions of all bars, plus
+        total_frames as the final boundary.
+
+        Each bar's audio slice is [start, next_boundary). Because edits only
+        reorder/duplicate/delete bars (never invent new time_ms), this set is
+        invariant under editing and stays sorted, so searchsorted against it is
+        always valid even when bars are duplicated.
+        """
+        starts = set()
+        for bar in self.bars:
+            if bar.beats:
+                starts.add(int(round(float(bar.beats[0].time_ms) * sr / 1000)))
+        starts.add(int(self.total_frames))
+        return np.array(sorted(starts), dtype=np.int64)
+
+    def bar_source_slice(self, bar: Bar, sr: int, bounds: np.ndarray) -> tuple[int, int]:
+        """Return the [start, end) source-frame slice for a single bar."""
+        if not bar.beats:
+            return (0, 0)
+        start = int(round(float(bar.beats[0].time_ms) * sr / 1000))
+        pos = int(np.searchsorted(bounds, start, side="right"))
+        end = int(bounds[pos]) if pos < len(bounds) else int(self.total_frames)
+        return (start, end)
+
     def bar_at_frame(self, frame_idx: int) -> int:
         if self.bar_frames is None:
             return 0

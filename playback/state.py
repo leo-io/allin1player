@@ -32,5 +32,9 @@ class TransportState:
     paused: bool = False
     loop_range: tuple | None = None
     selected: tuple | None = None
+    # Inclusive flat-bar range (lo, hi) for multi-bar edits, or None.
+    selection: tuple | None = None
     dirty: bool = False
     vq: VirtualQueue | None = None
+    cursor: int | None = None
+    play_bar: int | None = None

@@ -1,6 +1,5 @@
 from __future__ import annotations
 import tkinter as tk
-import numpy as np
 
 from domain.models import Arrangement
 from playback.state import TransportState
@@ -14,6 +13,7 @@ BAR_ACTIVE = "#2a3a5a"
 QUEUE_OUTLINE = "#44ff44"
 LOOP_OUTLINE = "#ff4444"
 SELECT_OUTLINE = "#66ccff"
+SELECT_BG = "#243a5a"
 VQUEUE_BG = "#2d1b4e"
 VQUEUE_OUTLINE = "#a78bfa"
 SECTION_HEADER_H = 24
@@ -43,15 +43,23 @@ class CanvasRenderer:
         available = cw - ROW_LABEL_W - PAD * 2
         return max(1, int(available // (BAR_W + BAR_GAP)))
 
+    def _in_selection(self, bar_idx: int, state: TransportState) -> bool:
+        sel = state.selection
+        return sel is not None and sel[0] <= bar_idx <= sel[1]
+
     def _bar_bg_color(self, bar_idx: int, state: TransportState) -> str:
         vq = state.vq
         if vq is not None and bar_idx in vq.bars:
             return VQUEUE_BG
+        if self._in_selection(bar_idx, state):
+            return SELECT_BG
         return BAR_BG
 
     def _bar_outline(self, bar_idx: int, state: TransportState) -> tuple:
         if state.loop_range and state.loop_range[0] <= bar_idx < state.loop_range[1]:
             return (LOOP_OUTLINE, 2)
+        if self._in_selection(bar_idx, state):
+            return (SELECT_OUTLINE, 2)
         if state.selected == ("bar", bar_idx):
             return (SELECT_OUTLINE, 2)
         vq = state.vq
@@ -164,56 +172,46 @@ class CanvasRenderer:
                     x += bw + BAR_GAP
                 y += self._row_total_h
 
+        # Draw cursor line between selected bar and next bar
+        if state.cursor is not None:
+            for item in self.bar_items:
+                if item["bar_idx"] == state.cursor:
+                    bbox = self.canvas.bbox(item["bg"])
+                    if bbox:
+                        _, y0, x1, y1 = bbox
+                        # Draw thin red line to the right of the cursor bar
+                        self.canvas.create_line(
+                            x1 + BAR_GAP // 2, y0, x1 + BAR_GAP // 2, y1,
+                            fill="#ff2222", width=2
+                        )
+                    break
+
         self.canvas.configure(scrollregion=(0, 0, cw, y + PAD))
 
-    def update_playhead(self, frame_idx: int, ms: float, state: TransportState):
-        if len(self.arrangement.beat_times_ms) == 0:
-            for item in self.bar_items:
-                bi = item["bar_idx"]
-                outline, width = self._bar_outline(bi, state)
-                self.canvas.itemconfig(item["bg"],
-                                       fill=self._bar_bg_color(bi, state),
-                                       outline=outline, width=width)
-                for bii, (r, t) in enumerate(item["beats"]):
-                    beat = item["beats_data"][bii]
-                    is_db = beat.position == 1
-                    self.canvas.itemconfig(r, fill="#665533" if is_db else BEAT_OFF)
-            return
+    def update_playhead(self, play_bar: int | None, beat_offset: int | None,
+                        state: TransportState):
+        """Highlight the bar/beat currently playing.
 
-        beat_idx = int(np.searchsorted(self.arrangement.beat_times_ms, ms, side="right") - 1)
-        if beat_idx < 0 or beat_idx >= len(self.arrangement.beat_times_ms):
-            for item in self.bar_items:
-                bi = item["bar_idx"]
-                outline, width = self._bar_outline(bi, state)
-                self.canvas.itemconfig(item["bg"],
-                                       fill=self._bar_bg_color(bi, state),
-                                       outline=outline, width=width)
-                for bii, (r, t) in enumerate(item["beats"]):
-                    beat = item["beats_data"][bii]
-                    is_db = beat.position == 1
-                    self.canvas.itemconfig(r, fill="#665533" if is_db else BEAT_OFF)
-            return
-
+        Driven by the engine's `play_bar` (a flat bar index) rather than a
+        global ms search, so it stays correct after edits that duplicate or
+        reorder bars.
+        """
         current_item = None
-        beat_offset_in_bar = None
-        cumulative_idx = 0
-        for item in self.bar_items:
-            bar_beat_count = len(item["beats_data"])
-            if cumulative_idx <= beat_idx < cumulative_idx + bar_beat_count:
-                current_item = item
-                beat_offset_in_bar = beat_idx - cumulative_idx
-                break
-            cumulative_idx += bar_beat_count
+        if play_bar is not None:
+            for item in self.bar_items:
+                if item["bar_idx"] == play_bar:
+                    current_item = item
+                    break
 
         for item in self.bar_items:
             bi = item["bar_idx"]
-            if item is current_item and beat_offset_in_bar is not None:
+            if item is current_item:
                 self.canvas.itemconfig(item["bg"],
                                        fill=BAR_ACTIVE, outline=DOWNBEAT, width=2)
                 for bii, (r, t) in enumerate(item["beats"]):
                     beat = item["beats_data"][bii]
                     is_db = beat.position == 1
-                    if bii == beat_offset_in_bar:
+                    if bii == beat_offset:
                         fill = DOWNBEAT if is_db else BEAT_ON
                     else:
                         fill = "#665533" if is_db else BEAT_OFF
