@@ -27,8 +27,9 @@ class PlaybackEngine:
         self.stream = None
         self._bounds = arrangement.source_bounds(sr)
 
-    def _slice(self, bar_idx: int) -> tuple[int, int]:
-        bars = self.arrangement.bars
+    def _slice(self, bar_idx: int, bars: list | None = None) -> tuple[int, int]:
+        if bars is None:
+            bars = self.arrangement.bars
         if not bars or bar_idx < 0 or bar_idx >= len(bars):
             return (0, 0)
         return self.arrangement.bar_source_slice(bars[bar_idx], self.sr, self._bounds)
@@ -36,7 +37,6 @@ class PlaybackEngine:
     def play(self, from_bar: int | None = None):
         with self.lock:
             bars = self.arrangement.bars
-            self._bounds = self.arrangement.source_bounds(self.sr)
             if from_bar is None:
                 from_bar = self.state.play_bar if self.state.play_bar is not None else 0
             from_bar = max(0, min(from_bar, len(bars) - 1)) if bars else 0
@@ -133,7 +133,7 @@ class PlaybackEngine:
                     self.state.playing = False
                     raise sd.CallbackStop()
 
-                start, end = self._slice(self.state.play_bar)
+                start, end = self._slice(self.state.play_bar, bars)
                 end = min(end, total)
                 # If the read head fell outside the current slice (just jumped
                 # here, or the bar list changed under us), reseat to its start.
@@ -155,6 +155,6 @@ class PlaybackEngine:
                         self.state.playing = False
                         raise sd.CallbackStop()
                     self.state.play_bar = nxt
-                    nstart, _ = self._slice(nxt)
+                    nstart, _ = self._slice(nxt, bars)
                     self.state.frame_idx = nstart
                     self.state.dirty = True

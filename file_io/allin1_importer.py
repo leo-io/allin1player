@@ -98,16 +98,23 @@ class Allin1Importer:
                 logger.debug("[CHECKPOINT] Exiting _build_bar_list() with empty result")
                 return all_bars
 
-            for idx, (t, num) in enumerate(zip(data.get("beats", []), data.get("beat_positions", []))):
+            raw_beats = data.get("beats", [])
+            beat_positions = data.get("beat_positions", [])
+            segments = data.get("segments", [])
+            last_finish_ms = int(round(float(segments[-1]["end"]) * 1000)) if segments else 0
+
+            start_ms_list = [int(round(float(t) * 1000)) for t in raw_beats]
+            finish_ms_list = start_ms_list[1:] + [last_finish_ms]
+
+            for idx, (start_ms, finish_ms, num) in enumerate(zip(start_ms_list, finish_ms_list, beat_positions)):
                 try:
-                    time_ms = int(round(float(t) * 1000))
                     beat_num = int(num)
                     if beat_num == 1 and current:
                         all_bars.append(current)
                         current = []
-                    current.append({"time_ms": time_ms, "beat": beat_num})
+                    current.append({"start_ms": start_ms, "finish_ms": finish_ms, "beat": beat_num})
                 except (ValueError, TypeError) as e:
-                    error_msg = f"Invalid beat data at index {idx}: time={t}, position={num}"
+                    error_msg = f"Invalid beat data at index {idx}: start_ms={start_ms}, position={num}"
                     logger.error(f"[EXCEPTION] {error_msg} | Error: {e}")
                     raise ValueError(error_msg) from e
 
@@ -146,7 +153,7 @@ class Allin1Importer:
 
                     seg_start_ms = float(seg_start) * 1000
                     seg_end_ms = float(seg_end) * 1000
-                    seg_bars = [b for b in all_bars if seg_start_ms <= b[0]["time_ms"] < seg_end_ms]
+                    seg_bars = [b for b in all_bars if seg_start_ms <= b[0]["start_ms"] < seg_end_ms]
 
                     if not seg_bars:
                         logger.debug(f"Segment '{label}' ({seg_start:.2f}s-{seg_end:.2f}s) has no bars, skipping")
@@ -208,7 +215,7 @@ class Allin1Importer:
                     for bar_data in sec.get("bars", []):
                         try:
                             beats = tuple(
-                                Beat(time_ms=beat["time_ms"], position=beat["beat"])
+                                Beat(start_ms=beat["start_ms"], finish_ms=beat["finish_ms"], position=beat["beat"])
                                 for beat in bar_data
                             )
                             bars.append(Bar(idx=bar_idx, beats=beats, audiosource=audio_source))

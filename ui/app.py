@@ -410,17 +410,7 @@ class ArrangementEditor:
         bar_idx = self.renderer.bar_at_xy(cx, cy)
         if bar_idx is not None:
             if is_ctrl:
-                with self.lock:
-                    if self.state.vq is None:
-                        self.state.vq = VirtualQueue(
-                            bars=[bar_idx],
-                            entry_bar=bar_idx,
-                            pos=0,
-                            active=True,
-                        )
-                    else:
-                        self.state.vq.bars.append(bar_idx)
-                    self.state.dirty = True
+                self._queue_bars([bar_idx])
                 self.renderer.draw_all(self.state)
             elif is_shift:
                 # Extend a contiguous selection from the anchor (cursor) to the
@@ -457,21 +447,9 @@ class ArrangementEditor:
                 # Ctrl+click on section: queue the section's bars
                 if sec_idx < len(self.arrangement.sections):
                     sec = self.arrangement.sections[sec_idx]
-                    bars_flat = self.arrangement.bars
                     if sec.bars:
-                        sec_first = bars_flat.index(sec.bars[0])
-                        bar_indices = list(range(sec_first, sec_first + len(sec.bars)))
-                        with self.lock:
-                            if self.state.vq is None:
-                                self.state.vq = VirtualQueue(
-                                    bars=bar_indices,
-                                    entry_bar=bar_indices[0],
-                                    pos=0,
-                                    active=True,
-                                )
-                            else:
-                                self.state.vq.bars.extend(bar_indices)
-                            self.state.dirty = True
+                        sec_first = self._section_first_bar_idx(sec)
+                        self._queue_bars(range(sec_first, sec_first + len(sec.bars)))
             else:
                 # Plain click selects a single section
                 self.state.selected = ("section", sec_idx)
@@ -510,9 +488,9 @@ class ArrangementEditor:
             sec_rng = self._selected_section_range()
             n_sel = (sec_rng[1] - sec_rng[0] + 1) if sec_rng else 0
             n_clip = len(self._clipboard_sections)
-            copy_label = f"Copy {n_sel} sections" if n_sel > 1 else "Copy"
-            delete_label = f"Delete {n_sel} sections" if n_sel > 1 else "Delete"
-            paste_label = f"Paste {n_clip} sections" if n_clip > 1 else "Paste"
+            copy_label = self._count_label("Copy", n_sel, "sections")
+            delete_label = self._count_label("Delete", n_sel, "sections")
+            paste_label = self._count_label("Paste", n_clip, "sections")
 
             menu = tk.Menu(self.root, tearoff=0, bg="#1a1a2e", fg="#e0e0e0")
 
@@ -579,9 +557,9 @@ class ArrangementEditor:
         rng = self._selected_range()
         n_sel = (rng[1] - rng[0] + 1) if rng else 0
         n_clip = len(self._clipboard_bars)
-        copy_label = f"Copy {n_sel} bars" if n_sel > 1 else "Copy"
-        delete_label = f"Delete {n_sel} bars" if n_sel > 1 else "Delete"
-        paste_label = f"Paste {n_clip} bars" if n_clip > 1 else "Paste"
+        copy_label = self._count_label("Copy", n_sel, "bars")
+        delete_label = self._count_label("Delete", n_sel, "bars")
+        paste_label = self._count_label("Paste", n_clip, "bars")
 
         menu = tk.Menu(self.root, tearoff=0, bg="#1a1a2e", fg="#e0e0e0")
 
@@ -762,19 +740,41 @@ class ArrangementEditor:
 
     def _section_flat_bar_range(self, sec_lo, sec_hi):
         """Inclusive flat-bar (lo, hi) spanning sections sec_lo..sec_hi."""
-        bars_flat = self.arrangement.bars
         lo = None
         hi = None
         for i in range(sec_lo, sec_hi + 1):
             if i < len(self.arrangement.sections):
                 sec = self.arrangement.sections[i]
                 if sec.bars:
-                    sec_first = bars_flat.index(sec.bars[0])
+                    sec_first = self._section_first_bar_idx(sec)
                     sec_last = sec_first + len(sec.bars) - 1
                     if lo is None:
                         lo = sec_first
                     hi = sec_last
         return (lo, hi) if lo is not None and hi is not None else None
+
+    def _section_first_bar_idx(self, sec):
+        """Flat-bar index of a section's first bar."""
+        return self.arrangement.bars.index(sec.bars[0])
+
+    def _queue_bars(self, bar_indices):
+        """Append bars to the virtual queue, creating it if needed."""
+        with self.lock:
+            if self.state.vq is None:
+                self.state.vq = VirtualQueue(
+                    bars=list(bar_indices),
+                    entry_bar=bar_indices[0],
+                    pos=0,
+                    active=True,
+                )
+            else:
+                self.state.vq.bars.extend(bar_indices)
+            self.state.dirty = True
+
+    @staticmethod
+    def _count_label(verb, n, noun):
+        """Menu label that pluralizes only when more than one item is affected."""
+        return f"{verb} {n} {noun}" if n > 1 else verb
 
     # ------------------------------------------------------------------ undo/redo
 
@@ -976,21 +976,10 @@ class ArrangementEditor:
         if sec_idx >= len(self.arrangement.sections):
             return
         sec = self.arrangement.sections[sec_idx]
-        bars_flat = self.arrangement.bars
         if sec.bars:
-            sec_first = bars_flat.index(sec.bars[0])
+            sec_first = self._section_first_bar_idx(sec)
             bar_indices = list(range(sec_first, sec_first + len(sec.bars)))
-            with self.lock:
-                if self.state.vq is None:
-                    self.state.vq = VirtualQueue(
-                        bars=bar_indices,
-                        entry_bar=bar_indices[0],
-                        pos=0,
-                        active=True,
-                    )
-                else:
-                    self.state.vq.bars.extend(bar_indices)
-                self.state.dirty = True
+            self._queue_bars(bar_indices)
             logger.info(f"Queued section {sec_idx} ({len(bar_indices)} bars)")
             self.renderer.draw_all(self.state)
 
@@ -1028,7 +1017,7 @@ class ArrangementEditor:
         bar = bars[play_bar]
         if not bar.beats:
             return None
-        beat_frames = [int(round(b.time_ms * self.sr / 1000)) for b in bar.beats]
+        beat_frames = [int(round(b.start_ms * self.sr / 1000)) for b in bar.beats]
         off = int(np.searchsorted(beat_frames, frame_idx, side="right") - 1)
         return max(0, min(off, len(bar.beats) - 1))
 
@@ -1072,8 +1061,7 @@ class ArrangementEditor:
                 if sec_idx < len(self.arrangement.sections):
                     sec = self.arrangement.sections[sec_idx]
                     if sec.bars:
-                        bars_flat = self.arrangement.bars
-                        return bars_flat.index(sec.bars[0])
+                        return self._section_first_bar_idx(sec)
         return 0
 
     def play(self):

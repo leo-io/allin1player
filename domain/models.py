@@ -10,8 +10,10 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class Beat:
-    time_ms: int
+    start_ms: int
+    finish_ms: int
     position: int
+    volume: int = 100
 
 
 @dataclass(frozen=True)
@@ -24,7 +26,7 @@ class Bar:
     def start_beat_idx(self) -> int:
         if not self.beats:
             return 0
-        beat_times = [b.time_ms for b in self.beats]
+        beat_times = [b.start_ms for b in self.beats]
         return int(np.searchsorted(beat_times, min(beat_times)))
 
     @property
@@ -41,6 +43,14 @@ class Section:
     idx: int
     name: str
     bars: list[Bar]
+    local_key: str = ""
+    local_bpm: float = 0.0
+    is_transition: bool = False
+    color: str = ""
+    transition_start_bpm: float = 0.0
+    transition_finish_bpm: float = 0.0
+    fade_out_bars: list[Bar] = field(default_factory=list)
+    fade_in_bars: list[Bar] = field(default_factory=list)
 
     def bar_count(self) -> int:
         return len(self.bars)
@@ -70,7 +80,7 @@ class Arrangement:
                     for bar in sec.bars:
                         for beat in bar.beats:
                             try:
-                                beat_times.append(beat.time_ms)
+                                beat_times.append(beat.start_ms)
                                 beat_numbers.append(beat.position)
                             except AttributeError as e:
                                 error_msg = f"Beat missing required attributes in section {sec_idx}: {e}"
@@ -117,14 +127,14 @@ class Arrangement:
                 try:
                     if bar.beats:
                         try:
-                            time_ms = bar.beats[0].time_ms
-                            frame = int(round(float(time_ms) * sr / 1000))
+                            start_ms = bar.beats[0].start_ms
+                            frame = int(round(float(start_ms) * sr / 1000))
                             if frame < 0:
-                                logger.warning(f"Negative frame calculated for bar {bar_idx}: time_ms={time_ms}, frame={frame}")
+                                logger.warning(f"Negative frame calculated for bar {bar_idx}: start_ms={start_ms}, frame={frame}")
                             frames.append(frame)
                         except (ValueError, TypeError) as e:
                             error_msg = f"Error calculating frame for bar {bar_idx}: {e}"
-                            logger.error(f"[EXCEPTION] {error_msg} | bar.beats[0].time_ms={bar.beats[0].time_ms}")
+                            logger.error(f"[EXCEPTION] {error_msg} | bar.beats[0].start_ms={bar.beats[0].start_ms}")
                             raise
                 except Exception as e:
                     error_msg = f"Error processing bar {bar_idx}: {type(e).__name__}: {e}"
@@ -162,14 +172,14 @@ class Arrangement:
         total_frames as the final boundary.
 
         Each bar's audio slice is [start, next_boundary). Because edits only
-        reorder/duplicate/delete bars (never invent new time_ms), this set is
+        reorder/duplicate/delete bars (never invent new start_ms), this set is
         invariant under editing and stays sorted, so searchsorted against it is
         always valid even when bars are duplicated.
         """
         starts = set()
         for bar in self.bars:
             if bar.beats:
-                starts.add(int(round(float(bar.beats[0].time_ms) * sr / 1000)))
+                starts.add(int(round(float(bar.beats[0].start_ms) * sr / 1000)))
         starts.add(int(self.total_frames))
         return np.array(sorted(starts), dtype=np.int64)
 
@@ -177,7 +187,7 @@ class Arrangement:
         """Return the [start, end) source-frame slice for a single bar."""
         if not bar.beats:
             return (0, 0)
-        start = int(round(float(bar.beats[0].time_ms) * sr / 1000))
+        start = int(round(float(bar.beats[0].start_ms) * sr / 1000))
         pos = int(np.searchsorted(bounds, start, side="right"))
         end = int(bounds[pos]) if pos < len(bounds) else int(self.total_frames)
         return (start, end)

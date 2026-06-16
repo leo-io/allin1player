@@ -36,15 +36,20 @@ class ArrangementStore:
             if master_p.exists():
                 try:
                     logger.info(f"Master arrangement file found: {master_p}")
-                    master = ArrangementStore._load(str(master_p))
-                    master.master = True
-                    logger.info(f"Loaded master arrangement '{master.name}' (created: {master.creationdate})")
-                    logger.debug(f"[CHECKPOINT] Master loaded successfully")
+                    if ArrangementStore._is_old_format(str(master_p)):
+                        logger.warning(f"Master arrangement at {master_p} uses old time_ms format — deleting and re-importing")
+                        master_p.unlink()
+                    else:
+                        master = ArrangementStore._load(str(master_p))
+                        master.master = True
+                        logger.info(f"Loaded master arrangement '{master.name}' (created: {master.creationdate})")
+                        logger.debug(f"[CHECKPOINT] Master loaded successfully")
                 except Exception as e:
                     error_msg = f"Failed to load master arrangement from {master_p}: {type(e).__name__}: {e}"
                     logger.error(f"[EXCEPTION] {error_msg}")
                     raise
-            else:
+
+            if not master_p.exists():
                 try:
                     logger.info(f"Master arrangement not found at {master_p}, will parse from allin1 analysis")
                     if analysis_path is None:
@@ -92,6 +97,22 @@ class ArrangementStore:
             raise
 
     @staticmethod
+    def _is_old_format(path: str) -> bool:
+        """Return True if the arrangement file uses the legacy time_ms beat format."""
+        try:
+            with open(path, encoding='utf-8') as f:
+                data = json.load(f)
+            for sec in data.get("sections", []):
+                for bar in sec.get("bars", []):
+                    for beat in bar.get("beats", []):
+                        if "time_ms" in beat and "start_ms" not in beat:
+                            return True
+                        return False
+        except Exception:
+            pass
+        return False
+
+    @staticmethod
     def _load(path: str) -> Arrangement:
         logger.debug(f"[CHECKPOINT] Entering _load() with path={path}")
         try:
@@ -129,7 +150,8 @@ class ArrangementStore:
                         try:
                             beats = tuple(
                                 Beat(
-                                    time_ms=int(beat.get("time_ms", 0)),
+                                    start_ms=int(beat.get("start_ms", 0)),
+                                    finish_ms=int(beat.get("finish_ms", 0)),
                                     position=int(beat.get("position", 0)),
                                 )
                                 for beat in bar_data.get("beats", [])
@@ -206,7 +228,8 @@ class ArrangementStore:
                                     "audiosource": bar.audiosource,
                                     "beats": [
                                         {
-                                            "time_ms": beat.time_ms,
+                                            "start_ms": beat.start_ms,
+                                            "finish_ms": beat.finish_ms,
                                             "position": beat.position,
                                         }
                                         for beat in bar.beats
