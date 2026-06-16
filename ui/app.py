@@ -10,6 +10,8 @@ import soundfile as sf
 
 from domain.models import Arrangement
 from file_io.arrangement_store import ArrangementStore
+from playback.engine import PlaybackEngine
+from playback.state import TransportState, VirtualQueue
 from ui.renderer import CanvasRenderer
 
 logger = logging.getLogger(__name__)
@@ -25,6 +27,9 @@ class ArrangementEditor:
         self.lock = threading.RLock()
         self.arrangement: Arrangement | None = None
         self.renderer = None
+        self.state = TransportState()
+        self.engine = None
+        self.audio_path = None
 
         # Audio cache: maps audiosource path -> (audio_data, sr)
         self.audio_cache: dict[str, tuple[np.ndarray, int]] = {}
@@ -275,6 +280,25 @@ class ArrangementEditor:
             logger.error(f"[EXCEPTION] {error_msg}")
             return
 
+        # Reset transport state for new file
+        self.state.frame_idx = 0
+        self.state.playing = False
+        self.state.paused = False
+        self.state.vq = None
+        self.state.loop_range = None
+        self.state.dirty = False
+
+        # Create playback engine
+        self.audio_path = first_bar.audiosource
+        self.engine = PlaybackEngine(
+            audio_data=self.audio_data,
+            arrangement=self.arrangement,
+            state=self.state,
+            lock=self.lock,
+            sr=self.sr,
+        )
+        logger.debug("[CHECKPOINT] PlaybackEngine created")
+
         # Initialize renderer
         try:
             self.renderer = CanvasRenderer(self.canvas, self.arrangement)
@@ -487,7 +511,7 @@ class ArrangementEditor:
             if result is None:
                 return
             if result:
-                self._cmd_save_project()
+                self._cmd_save()
         self.stop()
         self.root.destroy()
 
