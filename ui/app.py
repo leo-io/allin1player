@@ -40,6 +40,9 @@ class ArrangementEditor:
         # Clipboard for bar editing (list of bars, supports multi-bar copy)
         self._clipboard_bars = []
 
+        # Clipboard for section editing (list of sections, supports multi-section copy)
+        self._clipboard_sections = []
+
         # Undo/redo history (snapshots of the arrangement + selection state)
         self._undo_stack = []
         self._redo_stack = []
@@ -126,15 +129,16 @@ class ArrangementEditor:
         self.root.bind("<Key-Escape>", lambda e: self._on_key("escape"))
         self.root.bind("<Control-s>", lambda e: self._cmd_save())
         self.root.bind("<Control-S>", lambda e: self._cmd_save())
-        self.root.bind("<Delete>", lambda e: self._cmd_delete_bar())
-        self.root.bind("<Control-c>", lambda e: self._cmd_copy_bar())
-        self.root.bind("<Control-C>", lambda e: self._cmd_copy_bar())
-        self.root.bind("<Control-v>", lambda e: self._cmd_paste_bar())
-        self.root.bind("<Control-V>", lambda e: self._cmd_paste_bar())
+        self.root.bind("<Delete>", lambda e: self._cmd_delete())
+        self.root.bind("<Control-c>", lambda e: self._cmd_copy())
+        self.root.bind("<Control-C>", lambda e: self._cmd_copy())
+        self.root.bind("<Control-v>", lambda e: self._cmd_paste())
+        self.root.bind("<Control-V>", lambda e: self._cmd_paste())
         self.root.bind("<Control-z>", lambda e: self._cmd_undo())
         self.root.bind("<Control-y>", lambda e: self._cmd_redo())
         self.root.bind("<Control-Y>", lambda e: self._cmd_redo())
         self.root.bind("<Control-Shift-Z>", lambda e: self._cmd_redo())
+        self.root.bind("<Key-F2>", lambda e: self._cmd_rename_section())
 
     # ------------------------------------------------------------------ file loading
 
@@ -324,7 +328,11 @@ class ArrangementEditor:
         self.state.cursor = None
         self.state.play_bar = None
         self.state.selection = None
+        self.state.section_selection = None
+        self.state.section_cursor = None
+        self.state.has_section_clipboard = False
         self._clipboard_bars = []
+        self._clipboard_sections = []
         self._undo_stack = []
         self._redo_stack = []
 
@@ -429,18 +437,56 @@ class ArrangementEditor:
                 self.state.selected = ("bar", bar_idx)
                 self.state.cursor = bar_idx
                 self.state.selection = None
+                # Clear section state when clicking a bar
+                self.state.section_selection = None
+                self.state.section_cursor = None
                 self.renderer.draw_all(self.state)
             return
 
         sec_idx = self.renderer.section_at_xy(cx, cy)
         if sec_idx is not None:
-            self.state.selected = ("section", sec_idx)
+            is_ctrl_shift = is_ctrl and is_shift
+            if is_ctrl_shift:
+                # Multi-select sections with Ctrl+Shift+click
+                anchor_idx = self.state.selected[1] if (self.state.selected and
+                                                        self.state.selected[0] == "section") else sec_idx
+                self.state.section_selection = (min(anchor_idx, sec_idx), max(anchor_idx, sec_idx))
+                self.state.selected = ("section", sec_idx)
+                self.state.section_cursor = sec_idx
+            elif is_ctrl:
+                # Ctrl+click on section: queue the section's bars
+                if sec_idx < len(self.arrangement.sections):
+                    sec = self.arrangement.sections[sec_idx]
+                    bars_flat = self.arrangement.bars
+                    if sec.bars:
+                        sec_first = bars_flat.index(sec.bars[0])
+                        bar_indices = list(range(sec_first, sec_first + len(sec.bars)))
+                        with self.lock:
+                            if self.state.vq is None:
+                                self.state.vq = VirtualQueue(
+                                    bars=bar_indices,
+                                    entry_bar=bar_indices[0],
+                                    pos=0,
+                                    active=True,
+                                )
+                            else:
+                                self.state.vq.bars.extend(bar_indices)
+                            self.state.dirty = True
+            else:
+                # Plain click selects a single section
+                self.state.selected = ("section", sec_idx)
+                self.state.section_cursor = sec_idx
+                self.state.section_selection = None
+            # Clear bar state when clicking a section
             self.state.selection = None
+            self.state.cursor = None
             self.renderer.draw_all(self.state)
             return
 
         self.state.selected = None
         self.state.selection = None
+        self.state.section_selection = None
+        self.state.section_cursor = None
         self.renderer.draw_all(self.state)
 
     def _on_canvas_right_click(self, event):
@@ -450,6 +496,74 @@ class ArrangementEditor:
         if self.arrangement is None:
             return
 
+        # Check for section click first
+        sec_idx = self.renderer.section_at_xy(cx, cy)
+        if sec_idx is not None:
+            # If right-clicking outside current selection, reselect to that section
+            sec_rng = self._selected_section_range()
+            if not (sec_rng is not None and sec_rng[0] <= sec_idx <= sec_rng[1]):
+                self.state.selected = ("section", sec_idx)
+                self.state.section_cursor = sec_idx
+                self.state.section_selection = None
+            self.renderer.draw_all(self.state)
+
+            sec_rng = self._selected_section_range()
+            n_sel = (sec_rng[1] - sec_rng[0] + 1) if sec_rng else 0
+            n_clip = len(self._clipboard_sections)
+            copy_label = f"Copy {n_sel} sections" if n_sel > 1 else "Copy"
+            delete_label = f"Delete {n_sel} sections" if n_sel > 1 else "Delete"
+            paste_label = f"Paste {n_clip} sections" if n_clip > 1 else "Paste"
+
+            menu = tk.Menu(self.root, tearoff=0, bg="#1a1a2e", fg="#e0e0e0")
+
+            menu.add_command(
+                label="Rename",
+                command=self._cmd_rename_section,
+                accelerator="F2"
+            )
+            menu.add_command(
+                label=copy_label,
+                command=self._cmd_copy_section,
+                accelerator="Ctrl+C"
+            )
+            menu.add_command(
+                label=paste_label,
+                command=self._cmd_paste_section,
+                accelerator="Ctrl+V",
+                state="normal" if n_clip else "disabled"
+            )
+            menu.add_command(
+                label=delete_label,
+                command=self._cmd_delete_section,
+                accelerator="Delete",
+                state="normal" if n_sel < len(self.arrangement.sections) else "disabled"
+            )
+            menu.add_separator()
+
+            menu.add_command(
+                label="Queue Section",
+                command=self._cmd_queue_section,
+                accelerator="Ctrl+click"
+            )
+            has_queue = self.state.vq is not None and not self.state.vq.is_empty()
+            menu.add_command(
+                label="Clear Queue",
+                command=self._cmd_clear_queue,
+                state="normal" if has_queue else "disabled"
+            )
+            menu.add_command(
+                label="Toggle Loop Queue",
+                command=self._cmd_toggle_queue_loop,
+                state="normal" if has_queue else "disabled"
+            )
+
+            try:
+                menu.post(event.x_root, event.y_root)
+            except tk.TclError:
+                pass
+            return
+
+        # Bar right-click
         bar_idx = self.renderer.bar_at_xy(cx, cy)
         if bar_idx is None:
             return
@@ -607,7 +721,8 @@ class ArrangementEditor:
         half-updated bar list.
         """
         flat_idx = 0
-        for sec in self.arrangement.sections:
+        for sec_idx, sec in enumerate(self.arrangement.sections):
+            sec.idx = sec_idx
             new_bars = []
             for bar in sec.bars:
                 new_bars.append(dataclasses.replace(bar, idx=flat_idx))
@@ -635,6 +750,32 @@ class ArrangementEditor:
             return (self.state.cursor, self.state.cursor)
         return None
 
+    def _selected_section_range(self):
+        """Inclusive (lo, hi) section-index range: the active multi-section
+        selection, else the single section from state.selected, else None."""
+        if self.state.section_selection is not None:
+            return self.state.section_selection
+        if self.state.selected and self.state.selected[0] == "section":
+            sec_idx = self.state.selected[1]
+            return (sec_idx, sec_idx)
+        return None
+
+    def _section_flat_bar_range(self, sec_lo, sec_hi):
+        """Inclusive flat-bar (lo, hi) spanning sections sec_lo..sec_hi."""
+        bars_flat = self.arrangement.bars
+        lo = None
+        hi = None
+        for i in range(sec_lo, sec_hi + 1):
+            if i < len(self.arrangement.sections):
+                sec = self.arrangement.sections[i]
+                if sec.bars:
+                    sec_first = bars_flat.index(sec.bars[0])
+                    sec_last = sec_first + len(sec.bars) - 1
+                    if lo is None:
+                        lo = sec_first
+                    hi = sec_last
+        return (lo, hi) if lo is not None and hi is not None else None
+
     # ------------------------------------------------------------------ undo/redo
 
     def _snapshot(self):
@@ -643,6 +784,8 @@ class ArrangementEditor:
             copy.deepcopy(self.arrangement.sections),
             self.state.cursor,
             self.state.selection,
+            self.state.section_cursor,
+            self.state.section_selection,
         )
 
     def _push_undo(self):
@@ -656,12 +799,14 @@ class ArrangementEditor:
 
     def _restore(self, snapshot):
         """Install a snapshot, rebuild playback arrays, and redraw."""
-        sections, cursor, selection = snapshot
+        sections, cursor, selection, section_cursor, section_selection = snapshot
         with self.lock:
             self.arrangement.sections = copy.deepcopy(sections)
             self._reindex_arrangement()
             self.state.cursor = cursor
             self.state.selection = selection
+            self.state.section_cursor = section_cursor
+            self.state.section_selection = section_selection
             self._clamp_play_position()
             self.state.dirty = True
         self.renderer.draw_all(self.state)
@@ -749,6 +894,128 @@ class ArrangementEditor:
         logger.info(f"Pasted {len(new_bars)} bar(s) after bar {self.state.cursor - len(new_bars)}")
         self.renderer.draw_all(self.state)
 
+    def _cmd_rename_section(self):
+        """Rename the selected section via dialog."""
+        if self.arrangement is None or not self.state.selected or self.state.selected[0] != "section":
+            return
+        sec_idx = self.state.selected[1]
+        if sec_idx >= len(self.arrangement.sections):
+            return
+        sec = self.arrangement.sections[sec_idx]
+        from tkinter import simpledialog
+        new_name = simpledialog.askstring("Rename Section", f"New name for '{sec.name}':",
+                                          initialvalue=sec.name)
+        if new_name and new_name.strip():
+            self._push_undo()
+            with self.lock:
+                sec.name = new_name.strip()
+                self.state.dirty = True
+            logger.info(f"Renamed section {sec_idx} to '{new_name}'")
+            self.renderer.draw_all(self.state)
+
+    def _cmd_delete_section(self):
+        """Delete the selected section(s). Refuse if it would remove every section."""
+        if self.arrangement is None:
+            return
+        rng = self._selected_section_range()
+        if rng is None:
+            return
+        lo, hi = rng
+        if hi - lo + 1 >= len(self.arrangement.sections):
+            logger.warning("Cannot delete all sections in the arrangement")
+            return
+        self._push_undo()
+        with self.lock:
+            self.arrangement.sections = [s for i, s in enumerate(self.arrangement.sections)
+                                         if not (lo <= i <= hi)]
+            self._reindex_arrangement()
+            # Clamp section_cursor to valid range
+            new_cursor = min(lo, len(self.arrangement.sections) - 1) if self.arrangement.sections else None
+            self.state.section_cursor = new_cursor
+            self.state.section_selection = None
+            self._clamp_play_position()
+            self.state.dirty = True
+        logger.info(f"Deleted sections {lo}..{hi}")
+        self.renderer.draw_all(self.state)
+
+    def _cmd_copy_section(self):
+        """Copy the selected section(s) to the clipboard."""
+        if self.arrangement is None:
+            return
+        rng = self._selected_section_range()
+        if rng is None:
+            return
+        lo, hi = rng
+        self._clipboard_sections = [copy.deepcopy(s) for s in self.arrangement.sections[lo:hi + 1]]
+        self.state.has_section_clipboard = True
+        logger.info(f"Copied {len(self._clipboard_sections)} section(s) to clipboard")
+
+    def _cmd_paste_section(self):
+        """Paste clipboard sections at the cursor position (before that section)."""
+        if self.arrangement is None or not self._clipboard_sections:
+            logger.warning("Paste: no arrangement or section clipboard")
+            return
+        insert_idx = self.state.section_cursor if self.state.section_cursor is not None else len(self.arrangement.sections)
+        self._push_undo()
+        with self.lock:
+            new_secs = [copy.deepcopy(s) for s in self._clipboard_sections]
+            self.arrangement.sections[insert_idx:insert_idx] = new_secs
+            self._reindex_arrangement()
+            self.state.section_cursor = insert_idx + len(new_secs) - 1
+            self.state.section_selection = None
+            self._clamp_play_position()
+            self.state.dirty = True
+        logger.info(f"Pasted {len(new_secs)} section(s) at position {insert_idx}")
+        self.renderer.draw_all(self.state)
+
+    def _cmd_queue_section(self):
+        """Queue the selected section's bars."""
+        if self.arrangement is None or not self.state.selected or self.state.selected[0] != "section":
+            return
+        sec_idx = self.state.selected[1]
+        if sec_idx >= len(self.arrangement.sections):
+            return
+        sec = self.arrangement.sections[sec_idx]
+        bars_flat = self.arrangement.bars
+        if sec.bars:
+            sec_first = bars_flat.index(sec.bars[0])
+            bar_indices = list(range(sec_first, sec_first + len(sec.bars)))
+            with self.lock:
+                if self.state.vq is None:
+                    self.state.vq = VirtualQueue(
+                        bars=bar_indices,
+                        entry_bar=bar_indices[0],
+                        pos=0,
+                        active=True,
+                    )
+                else:
+                    self.state.vq.bars.extend(bar_indices)
+                self.state.dirty = True
+            logger.info(f"Queued section {sec_idx} ({len(bar_indices)} bars)")
+            self.renderer.draw_all(self.state)
+
+    # Contextual dispatchers for shared shortcuts
+    def _cmd_delete(self):
+        """Delete contextually: section if a section is selected, else bar."""
+        if self.state.selected and self.state.selected[0] == "section":
+            self._cmd_delete_section()
+        else:
+            self._cmd_delete_bar()
+
+    def _cmd_copy(self):
+        """Copy contextually: section if a section is selected, else bar."""
+        if self.state.selected and self.state.selected[0] == "section":
+            self._cmd_copy_section()
+        else:
+            self._cmd_copy_bar()
+
+    def _cmd_paste(self):
+        """Paste contextually: section if section clipboard non-empty, else bar."""
+        if self.state.has_section_clipboard:
+            self._cmd_paste_section()
+        else:
+            self._cmd_paste_bar()
+
     # ------------------------------------------------------------------ poll loop
 
     def _beat_offset_in_bar(self, play_bar, frame_idx):
@@ -793,11 +1060,20 @@ class ArrangementEditor:
     # ------------------------------------------------------------------ playback controls
 
     def _start_bar(self):
-        """Bar to begin playback from: the cursor, else the selected bar, else 0."""
+        """Bar to begin playback from: the cursor, else selected section/bar, else 0."""
         if self.state.cursor is not None:
             return self.state.cursor
-        if self.state.selected and self.state.selected[0] == "bar":
-            return self.state.selected[1]
+        if self.state.selected:
+            if self.state.selected[0] == "bar":
+                return self.state.selected[1]
+            elif self.state.selected[0] == "section":
+                # Start from first bar of selected section
+                sec_idx = self.state.selected[1]
+                if sec_idx < len(self.arrangement.sections):
+                    sec = self.arrangement.sections[sec_idx]
+                    if sec.bars:
+                        bars_flat = self.arrangement.bars
+                        return bars_flat.index(sec.bars[0])
         return 0
 
     def play(self):

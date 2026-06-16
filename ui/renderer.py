@@ -47,6 +47,15 @@ class CanvasRenderer:
         sel = state.selection
         return sel is not None and sel[0] <= bar_idx <= sel[1]
 
+    def _section_selected(self, sec_idx: int, state: TransportState) -> bool:
+        """Check if section is in the active selection or is the single selected section."""
+        if state.selected == ("section", sec_idx):
+            return True
+        if state.section_selection is not None:
+            lo, hi = state.section_selection
+            return lo <= sec_idx <= hi
+        return False
+
     def _bar_bg_color(self, bar_idx: int, state: TransportState) -> str:
         vq = state.vq
         if vq is not None and bar_idx in vq.bars:
@@ -90,7 +99,7 @@ class CanvasRenderer:
             sec_first_bar_idx = bars_flat.index(sec.bars[0]) if sec.bars else 0
             sec_end_bar_idx = sec_first_bar_idx + len(sec.bars)
 
-            sec_is_selected = state.selected == ("section", sec.idx)
+            sec_is_selected = self._section_selected(sec.idx, state)
             sec_is_looping = state.loop_range == (sec_first_bar_idx, sec_end_bar_idx)
             header_text = f"{sec.name.upper()} [{len(sec.bars)}]"
             header_bg_color = "#2a3a5a" if (sec_is_selected or sec_is_looping) else "#1a2a40"
@@ -111,6 +120,14 @@ class CanvasRenderer:
                 "sec_idx": sec.idx,
                 "range": (sec_first_bar_idx, sec_end_bar_idx),
             })
+
+            # Draw red insertion line if this section is the paste cursor and clipboard is non-empty
+            if state.has_section_clipboard and state.section_cursor == sec.idx:
+                self.canvas.create_line(
+                    PAD, y, cw - PAD, y,
+                    fill="#ff2222", width=2
+                )
+
             y += SECTION_HEADER_H + 4
 
             for row_offset in range(0, len(sec.bars), bpr):

@@ -38,3 +38,7 @@ class TransportState:
     vq: VirtualQueue | None = None
     cursor: int | None = None
     play_bar: int | None = None
+    # Section editing state
+    section_selection: tuple | None = None  # Inclusive (lo, hi) section-index range
+    section_cursor: int | None = None  # Section index marking paste insertion line
+    has_section_clipboard: bool = False  # Gates rendering of red insertion line
