@@ -159,7 +159,8 @@ class ArrangementStore:
                             bars.append(Bar(
                                 idx=bar_data.get("idx", bar_idx),
                                 beats=beats,
-                                audiosource=bar_data.get("audiosource", "")
+                                audiosource=bar_data.get("audiosource", ""),
+                                color=bar_data.get("color", ""),
                             ))
                             total_beats += len(beats)
                         except (KeyError, TypeError, ValueError) as e:
@@ -226,6 +227,7 @@ class ArrangementStore:
                                 {
                                     "idx": bar.idx,
                                     "audiosource": bar.audiosource,
+                                    "color": bar.color,
                                     "beats": [
                                         {
                                             "start_ms": beat.start_ms,

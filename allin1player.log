@@ -65,3 +65,485 @@
 2026-06-15 02:54:27,133 [INFO] __main__: === Allin1 Arrangement Editor Started ===
 2026-06-15 02:54:27,134 [INFO] __main__: File specified: .\music\20260612_221624-moment\20260612_221624-moment.wav
 2026-06-15 02:54:27,134 [INFO] __main__: WAV file specified, creating/loading arrangement: music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 03:02:49,152 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 03:02:49,153 [INFO] __main__: File specified: .\music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 03:02:49,154 [INFO] __main__: WAV file specified, creating/loading arrangement: music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 03:02:49,293 [INFO] ui.app: Creating arrangement from analysis: music\20260612_221624-moment\20260612_221624-moment.json
+2026-06-15 03:02:49,293 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 03:02:49,293 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 03:02:49,294 [INFO] file_io.arrangement_store: Master arrangement not found at music\20260612_221624-moment\20260612_221624-moment.arrangement.master.json, will parse from allin1 analysis
+2026-06-15 03:02:49,294 [INFO] file_io.allin1_importer: [CHECKPOINT] Entering load() with path=music\20260612_221624-moment\20260612_221624-moment.json
+2026-06-15 03:02:49,294 [INFO] file_io.allin1_importer: Loading allin1 analysis JSON: music\20260612_221624-moment\20260612_221624-moment.json
+2026-06-15 03:02:49,296 [INFO] file_io.allin1_importer: Successfully created master arrangement '20260612_221624-moment-master' with 13 sections, 131 bars
+2026-06-15 03:02:49,297 [INFO] file_io.allin1_importer: [CHECKPOINT] Exiting load() successfully with arrangement name='20260612_221624-moment-master'
+2026-06-15 03:02:49,297 [INFO] file_io.arrangement_store: Saving master arrangement to: music\20260612_221624-moment\20260612_221624-moment.arrangement.master.json
+2026-06-15 03:02:49,302 [INFO] file_io.arrangement_store: Saved arrangement: music\20260612_221624-moment\20260612_221624-moment.arrangement.master.json (13 sections, 131 bars, 520 beats)
+2026-06-15 03:02:49,302 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-15 03:02:49,302 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-15 03:02:49,302 [INFO] ui.app: Saving master arrangement to: music\20260612_221624-moment\20260612_221624-moment.arrangement.master.json
+2026-06-15 03:02:49,310 [INFO] file_io.arrangement_store: Saved arrangement: music\20260612_221624-moment\20260612_221624-moment.arrangement.master.json (13 sections, 131 bars, 520 beats)
+2026-06-15 03:02:49,310 [ERROR] ui.app: [EXCEPTION] Error creating arrangement from analysis: AttributeError: 'ArrangementEditor' object has no attribute 'engine'
+2026-06-15 03:45:23,679 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 03:45:23,680 [INFO] __main__: File specified: .\music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 03:45:23,681 [INFO] __main__: WAV file specified, creating/loading arrangement: music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 03:45:23,806 [INFO] ui.app: Creating arrangement from analysis: music\20260612_221624-moment\20260612_221624-moment.json
+2026-06-15 03:45:23,806 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 03:45:23,807 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: music\20260612_221624-moment\20260612_221624-moment.wav
+2026-06-15 03:45:23,807 [INFO] file_io.arrangement_store: Master arrangement file found: music\20260612_221624-moment\20260612_221624-moment.arrangement.master.json
+2026-06-15 03:45:23,809 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-moment-master', 131 bars, 520 beats, created=1781503369296
+2026-06-15 03:45:23,809 [INFO] file_io.arrangement_store: Loaded master arrangement '20260612_221624-moment-master' (created: 1781503369296)
+2026-06-15 03:45:23,810 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-15 03:45:23,810 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-15 03:45:23,810 [INFO] ui.app: Saving master arrangement to: music\20260612_221624-moment\20260612_221624-moment.arrangement.master.json
+2026-06-15 03:45:23,816 [INFO] file_io.arrangement_store: Saved arrangement: music\20260612_221624-moment\20260612_221624-moment.arrangement.master.json (13 sections, 131 bars, 520 beats)
+2026-06-15 03:45:23,816 [ERROR] ui.app: [EXCEPTION] Error creating arrangement from analysis: AttributeError: 'ArrangementEditor' object has no attribute 'engine'
+2026-06-15 03:46:05,565 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 03:46:05,566 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie_original.wav
+2026-06-15 03:46:05,567 [INFO] __main__: WAV file specified, creating/loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie_original.wav
+2026-06-15 03:46:05,567 [ERROR] __main__: Analysis file not found: music\20260612_221624-bourgie\20260612_221624-bourgie_original.json
+2026-06-15 03:46:18,297 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-15 03:46:18,298 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-15 03:46:18,299 [INFO] __main__: WAV file specified, creating/loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-15 03:46:18,442 [INFO] ui.app: Creating arrangement from analysis: music\20260612_221624-bourgie\20260612_221624-bourgie.json
+2026-06-15 03:46:18,443 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-15 03:46:18,443 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-15 03:46:18,443 [INFO] file_io.arrangement_store: Master arrangement not found at music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json, will parse from allin1 analysis
+2026-06-15 03:46:18,443 [INFO] file_io.allin1_importer: [CHECKPOINT] Entering load() with path=music\20260612_221624-bourgie\20260612_221624-bourgie.json
+2026-06-15 03:46:18,443 [INFO] file_io.allin1_importer: Loading allin1 analysis JSON: music\20260612_221624-bourgie\20260612_221624-bourgie.json
+2026-06-15 03:46:18,458 [INFO] file_io.allin1_importer: Successfully created master arrangement '20260612_221624-bourgie-master' with 17 sections, 182 bars
+2026-06-15 03:46:18,458 [INFO] file_io.allin1_importer: [CHECKPOINT] Exiting load() successfully with arrangement name='20260612_221624-bourgie-master'
+2026-06-15 03:46:18,459 [INFO] file_io.arrangement_store: Saving master arrangement to: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-15 03:46:18,471 [INFO] file_io.arrangement_store: Saved arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json (17 sections, 182 bars, 725 beats)
+2026-06-15 03:46:18,471 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-15 03:46:18,472 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-15 03:46:18,472 [INFO] ui.app: Saving master arrangement to: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-15 03:46:18,479 [INFO] file_io.arrangement_store: Saved arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json (17 sections, 182 bars, 725 beats)
+2026-06-15 03:46:18,479 [ERROR] ui.app: [EXCEPTION] Error creating arrangement from analysis: AttributeError: 'ArrangementEditor' object has no attribute 'engine'
+2026-06-16 11:48:17,490 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 11:48:17,492 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 11:48:17,492 [INFO] __main__: WAV file specified, creating/loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 11:48:17,770 [INFO] ui.app: Creating arrangement from analysis: music\20260612_221624-bourgie\20260612_221624-bourgie.json
+2026-06-16 11:48:17,770 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 11:48:17,770 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 11:48:17,770 [INFO] file_io.arrangement_store: Master arrangement file found: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 11:48:17,776 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master', 182 bars, 725 beats, created=1781505978458
+2026-06-16 11:48:17,776 [INFO] file_io.arrangement_store: Loaded master arrangement '20260612_221624-bourgie-master' (created: 1781505978458)
+2026-06-16 11:48:17,776 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-16 11:48:17,776 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-16 11:48:17,777 [INFO] ui.app: Saving master arrangement to: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 11:48:17,784 [INFO] file_io.arrangement_store: Saved arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json (17 sections, 182 bars, 725 beats)
+2026-06-16 11:48:17,784 [ERROR] ui.app: [EXCEPTION] Error creating arrangement from analysis: AttributeError: 'ArrangementEditor' object has no attribute 'engine'
+2026-06-16 12:06:10,868 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 12:06:10,869 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 12:06:10,869 [INFO] __main__: WAV file specified, creating/loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 12:06:11,020 [INFO] ui.app: Creating arrangement from analysis: music\20260612_221624-bourgie\20260612_221624-bourgie.json
+2026-06-16 12:06:11,021 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 12:06:11,021 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 12:06:11,021 [INFO] file_io.arrangement_store: Master arrangement file found: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 12:06:11,024 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master', 182 bars, 725 beats, created=1781505978458
+2026-06-16 12:06:11,025 [INFO] file_io.arrangement_store: Loaded master arrangement '20260612_221624-bourgie-master' (created: 1781505978458)
+2026-06-16 12:06:11,025 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-16 12:06:11,025 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-16 12:06:11,025 [INFO] ui.app: Saving master arrangement to: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 12:06:11,033 [INFO] file_io.arrangement_store: Saved arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json (17 sections, 182 bars, 725 beats)
+2026-06-16 12:06:11,033 [ERROR] ui.app: [EXCEPTION] Error creating arrangement from analysis: AttributeError: 'ArrangementEditor' object has no attribute 'engine'
+2026-06-16 12:13:32,516 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 12:13:32,516 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 12:13:32,517 [INFO] __main__: WAV file specified, creating/loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 12:13:32,679 [INFO] ui.app: Creating arrangement from analysis: music\20260612_221624-bourgie\20260612_221624-bourgie.json
+2026-06-16 12:13:32,679 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 12:13:32,679 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 12:13:32,680 [INFO] file_io.arrangement_store: Master arrangement file found: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 12:13:32,682 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master', 182 bars, 725 beats, created=1781505978458
+2026-06-16 12:13:32,682 [INFO] file_io.arrangement_store: Loaded master arrangement '20260612_221624-bourgie-master' (created: 1781505978458)
+2026-06-16 12:13:32,683 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-16 12:13:32,683 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-16 12:13:32,683 [INFO] ui.app: Saving master arrangement to: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 12:13:32,690 [INFO] file_io.arrangement_store: Saved arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json (17 sections, 182 bars, 725 beats)
+2026-06-16 12:13:32,697 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master', 182 bars, 725 beats, created=1781505978458
+2026-06-16 12:13:33,048 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 12:13:33,049 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 12:13:33,068 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 12:27:55,327 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 12:27:55,328 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 12:27:55,329 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 12:27:55,479 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 12:27:55,851 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 12:27:55,852 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 12:27:55,863 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 12:57:04,056 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 12:57:04,057 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 12:57:04,057 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 12:57:04,235 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 12:57:04,587 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 12:57:04,588 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 12:57:04,600 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 12:59:34,517 [INFO] ui.app: Copied bar 23 to clipboard
+2026-06-16 12:59:34,731 [INFO] ui.app: Copied bar 23 to clipboard
+2026-06-16 12:59:34,918 [INFO] ui.app: Copied bar 23 to clipboard
+2026-06-16 12:59:35,072 [INFO] ui.app: Copied bar 23 to clipboard
+2026-06-16 12:59:40,145 [INFO] ui.app: Copied bar 30 to clipboard
+2026-06-16 12:59:40,333 [INFO] ui.app: Copied bar 30 to clipboard
+2026-06-16 12:59:40,492 [INFO] ui.app: Copied bar 30 to clipboard
+2026-06-16 13:01:03,709 [INFO] ui.app: Copied bar 1 to clipboard
+2026-06-16 13:01:04,197 [INFO] ui.app: Copied bar 1 to clipboard
+2026-06-16 13:14:14,151 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 13:14:14,152 [INFO] __main__: No file specified, launching browser
+2026-06-16 13:15:55,126 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 13:15:55,127 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 13:15:55,127 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 13:15:55,294 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 13:15:55,599 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 13:15:55,599 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 13:15:55,610 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 13:16:24,468 [INFO] ui.app: Copied bar 16 to clipboard
+2026-06-16 13:19:09,587 [INFO] ui.app: Copied bar 29 to clipboard
+2026-06-16 13:55:05,021 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 13:55:05,022 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 13:55:05,022 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 13:55:05,161 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 13:55:05,540 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 13:55:05,541 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 13:55:05,556 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 13:56:11,609 [INFO] ui.app: Copied bar 18 to clipboard
+2026-06-16 13:58:03,152 [INFO] ui.app: Copied bar 31 to clipboard
+2026-06-16 14:05:26,535 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 14:05:26,536 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 14:05:26,536 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 14:05:26,700 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 14:05:27,066 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 14:05:27,067 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 14:05:27,080 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 14:06:18,142 [INFO] ui.app: Copied bar 22 to clipboard
+2026-06-16 14:11:48,980 [INFO] ui.app: Copied bar 130 to clipboard
+2026-06-16 14:12:04,757 [INFO] ui.app: Copied bar 131 to clipboard
+2026-06-16 14:13:16,455 [INFO] ui.app: Copied bar 131 to clipboard
+2026-06-16 14:21:23,485 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 14:21:23,486 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 14:21:23,486 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 14:21:23,621 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 14:21:23,992 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 14:21:23,993 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 14:21:24,006 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 14:22:19,681 [INFO] ui.app: Copied 2 bar(s) to clipboard
+2026-06-16 14:22:35,968 [INFO] ui.app: Pasted 2 bar(s) after bar 41
+2026-06-16 14:33:36,528 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 14:33:36,529 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 14:33:36,529 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 14:33:36,658 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 14:33:36,996 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 14:33:36,997 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 14:33:37,008 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 15:26:16,287 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 15:26:16,288 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 15:26:16,288 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 15:26:16,552 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 15:26:16,933 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 15:26:16,934 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 15:26:16,948 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 15:27:44,854 [INFO] ui.app: Copied 1 section(s) to clipboard
+2026-06-16 15:27:55,892 [INFO] ui.app: Pasted 1 section(s) at position 10
+2026-06-16 15:28:22,378 [INFO] ui.app: Deleted bars 68..74
+2026-06-16 15:28:28,844 [INFO] ui.app: Copied 1 section(s) to clipboard
+2026-06-16 15:28:37,555 [INFO] ui.app: Pasted 1 section(s) at position 9
+2026-06-16 15:43:05,615 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 15:43:05,616 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 15:43:05,616 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 15:43:05,777 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 15:43:06,130 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 15:43:06,131 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 15:43:06,144 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 15:43:19,475 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 15:43:19,476 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 15:43:19,477 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 15:43:19,610 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 15:43:19,929 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 15:43:19,929 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 15:43:19,940 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 15:43:47,578 [INFO] ui.app: Copied 1 section(s) to clipboard
+2026-06-16 17:27:00,370 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 17:27:00,371 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 17:27:00,371 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 17:27:00,644 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master-v1', 182 bars, 725 beats, created=1781505978458
+2026-06-16 17:27:01,017 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 17:27:01,018 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.v1.json
+2026-06-16 17:27:01,044 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 17:27:38,656 [INFO] ui.app: Copied 1 bar(s) to clipboard
+2026-06-16 17:27:42,060 [INFO] ui.app: Pasted 1 bar(s) after bar 21
+2026-06-16 17:28:09,228 [INFO] ui.app: Deleted bars 23..23
+2026-06-16 17:29:18,674 [INFO] ui.app: Renamed section 5 to 'chorus 2'
+2026-06-16 17:30:06,938 [INFO] ui.app: Copied 1 bar(s) to clipboard
+2026-06-16 17:30:12,535 [INFO] ui.app: Pasted 1 bar(s) after bar 74
+2026-06-16 17:30:23,417 [INFO] ui.app: Deleted bars 76..77
+2026-06-16 17:30:49,863 [INFO] ui.app: Undo (history: 4 left)
+2026-06-16 17:31:00,398 [INFO] ui.app: Undo (history: 3 left)
+2026-06-16 17:31:24,559 [INFO] ui.app: Copied 2 bar(s) to clipboard
+2026-06-16 17:31:31,547 [INFO] ui.app: Pasted 2 bar(s) after bar 74
+2026-06-16 17:31:41,823 [INFO] ui.app: Deleted bars 77..78
+2026-06-16 17:57:51,770 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 17:57:51,771 [INFO] __main__: File specified: .\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 17:57:51,772 [INFO] __main__: Loading arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 17:57:51,920 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master', 182 bars, 725 beats, created=1781505978458
+2026-06-16 17:57:52,210 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 17:57:52,212 [INFO] ui.app: Loaded arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 17:57:52,223 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 17:58:06,053 [INFO] ui.app: Saving arrangement to: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.json
+2026-06-16 17:58:06,053 [INFO] file_io.arrangement_store: Saving user edits for audio: music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 17:58:06,065 [INFO] file_io.arrangement_store: Saved arrangement: music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.json (17 sections, 182 bars, 725 beats)
+2026-06-16 17:58:06,065 [INFO] ui.app: [CHECKPOINT] Save completed successfully
+2026-06-16 18:01:11,340 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 18:01:11,341 [INFO] __main__: File specified: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 18:01:11,341 [INFO] __main__: WAV file specified, creating/loading arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 18:01:11,480 [INFO] ui.app: Creating arrangement from analysis: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.json
+2026-06-16 18:01:11,480 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 18:01:11,480 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 18:01:11,481 [INFO] file_io.arrangement_store: Master arrangement not found at C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json, will parse from allin1 analysis
+2026-06-16 18:01:11,481 [INFO] file_io.allin1_importer: [CHECKPOINT] Entering load() with path=C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.json
+2026-06-16 18:01:11,481 [INFO] file_io.allin1_importer: Loading allin1 analysis JSON: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.json
+2026-06-16 18:01:11,484 [INFO] file_io.allin1_importer: Successfully created master arrangement '20260612_221624-bourgie-master' with 17 sections, 182 bars
+2026-06-16 18:01:11,484 [INFO] file_io.allin1_importer: [CHECKPOINT] Exiting load() successfully with arrangement name='20260612_221624-bourgie-master'
+2026-06-16 18:01:11,484 [INFO] file_io.arrangement_store: Saving master arrangement to: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 18:01:11,492 [INFO] file_io.arrangement_store: Saved arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json (17 sections, 182 bars, 725 beats)
+2026-06-16 18:01:11,492 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-16 18:01:11,493 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-16 18:01:11,493 [INFO] ui.app: Saving master arrangement to: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 18:01:11,501 [INFO] file_io.arrangement_store: Saved arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json (17 sections, 182 bars, 725 beats)
+2026-06-16 18:01:11,506 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master', 182 bars, 725 beats, created=1781643671484
+2026-06-16 18:01:11,819 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 18:01:11,820 [INFO] ui.app: Loaded arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 18:01:11,831 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 18:03:10,353 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 18:03:10,354 [INFO] __main__: File specified: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 18:03:10,354 [INFO] __main__: WAV file specified, creating/loading arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 18:03:10,483 [INFO] ui.app: Creating arrangement from analysis: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.json
+2026-06-16 18:03:10,483 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 18:03:10,483 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.wav
+2026-06-16 18:03:10,484 [INFO] file_io.arrangement_store: Master arrangement file found: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 18:03:10,489 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master', 182 bars, 725 beats, created=1781643671484
+2026-06-16 18:03:10,489 [INFO] file_io.arrangement_store: Loaded master arrangement '20260612_221624-bourgie-master' (created: 1781643671484)
+2026-06-16 18:03:10,489 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-16 18:03:10,489 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-16 18:03:10,489 [INFO] ui.app: Saving master arrangement to: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 18:03:10,498 [INFO] file_io.arrangement_store: Saved arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json (17 sections, 182 bars, 725 beats)
+2026-06-16 18:03:10,505 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master', 182 bars, 725 beats, created=1781643671484
+2026-06-16 18:03:10,801 [INFO] ui.app: Audio loaded: sr=44100, duration=368666ms, samples=16258176
+2026-06-16 18:03:10,802 [INFO] ui.app: Loaded arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\20260612_221624-bourgie.arrangement.master.json
+2026-06-16 18:03:10,813 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 18:54:00,105 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 18:54:34,512 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master', 182 bars, 725 beats, created=1781643671484
+2026-06-16 18:54:50,372 [INFO] ui.mix_app: Added 17 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/20260612_221624-bourgie.arrangement.master.json
+2026-06-16 18:56:46,540 [INFO] file_io.mix_store: Saved mix 'New Mix' (17 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 19:15:35,281 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 19:15:41,953 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 17 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 19:19:30,224 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 19:19:30,224 [INFO] __main__: File specified: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.wav
+2026-06-16 19:19:30,225 [INFO] __main__: WAV file specified, creating/loading arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.wav
+2026-06-16 19:19:30,353 [INFO] ui.app: Creating arrangement from analysis: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.json
+2026-06-16 19:19:30,353 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.wav
+2026-06-16 19:19:30,353 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.wav
+2026-06-16 19:19:30,354 [INFO] file_io.arrangement_store: Master arrangement not found at C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.arrangement.master.json, will parse from allin1 analysis
+2026-06-16 19:19:30,354 [INFO] file_io.allin1_importer: [CHECKPOINT] Entering load() with path=C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.json
+2026-06-16 19:19:30,354 [INFO] file_io.allin1_importer: Loading allin1 analysis JSON: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.json
+2026-06-16 19:19:30,362 [INFO] file_io.allin1_importer: Successfully created master arrangement '20260612_221624-ciudad-master' with 21 sections, 192 bars
+2026-06-16 19:19:30,362 [INFO] file_io.allin1_importer: [CHECKPOINT] Exiting load() successfully with arrangement name='20260612_221624-ciudad-master'
+2026-06-16 19:19:30,362 [INFO] file_io.arrangement_store: Saving master arrangement to: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.arrangement.master.json
+2026-06-16 19:19:30,370 [INFO] file_io.arrangement_store: Saved arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.arrangement.master.json (21 sections, 192 bars, 768 beats)
+2026-06-16 19:19:30,370 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-16 19:19:30,370 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-16 19:19:30,371 [INFO] ui.app: Saving master arrangement to: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.arrangement.master.json
+2026-06-16 19:19:30,383 [INFO] file_io.arrangement_store: Saved arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.arrangement.master.json (21 sections, 192 bars, 768 beats)
+2026-06-16 19:19:30,390 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-ciudad-master', 192 bars, 768 beats, created=1781648370362
+2026-06-16 19:19:30,762 [INFO] ui.app: Audio loaded: sr=44100, duration=401520ms, samples=17707032
+2026-06-16 19:19:30,762 [INFO] ui.app: Loaded arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-ciudad\20260612_221624-ciudad.arrangement.master.json
+2026-06-16 19:19:30,776 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 19:22:24,314 [INFO] __main__: === Allin1 Arrangement Editor Started ===
+2026-06-16 19:22:24,315 [INFO] __main__: File specified: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.wav
+2026-06-16 19:22:24,315 [INFO] __main__: WAV file specified, creating/loading arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.wav
+2026-06-16 19:22:24,466 [INFO] ui.app: Creating arrangement from analysis: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.json
+2026-06-16 19:22:24,466 [INFO] file_io.arrangement_store: [CHECKPOINT] Entering load_or_create() with audio_path=C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.wav
+2026-06-16 19:22:24,466 [INFO] file_io.arrangement_store: Loading or creating arrangement for audio: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.wav
+2026-06-16 19:22:24,467 [INFO] file_io.arrangement_store: Master arrangement not found at C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.arrangement.master.json, will parse from allin1 analysis
+2026-06-16 19:22:24,467 [INFO] file_io.allin1_importer: [CHECKPOINT] Entering load() with path=C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.json
+2026-06-16 19:22:24,467 [INFO] file_io.allin1_importer: Loading allin1 analysis JSON: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.json
+2026-06-16 19:22:24,470 [INFO] file_io.allin1_importer: Successfully created master arrangement '20260612_163540-sleeping-master' with 20 sections, 185 bars
+2026-06-16 19:22:24,471 [INFO] file_io.allin1_importer: [CHECKPOINT] Exiting load() successfully with arrangement name='20260612_163540-sleeping-master'
+2026-06-16 19:22:24,471 [INFO] file_io.arrangement_store: Saving master arrangement to: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.arrangement.master.json
+2026-06-16 19:22:24,479 [INFO] file_io.arrangement_store: Saved arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.arrangement.master.json (20 sections, 185 bars, 737 beats)
+2026-06-16 19:22:24,479 [INFO] file_io.arrangement_store: No user edits found, using master arrangement
+2026-06-16 19:22:24,479 [INFO] file_io.arrangement_store: [CHECKPOINT] Exiting load_or_create() with master arrangement
+2026-06-16 19:22:24,480 [INFO] ui.app: Saving master arrangement to: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.arrangement.master.json
+2026-06-16 19:22:24,487 [INFO] file_io.arrangement_store: Saved arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.arrangement.master.json (20 sections, 185 bars, 737 beats)
+2026-06-16 19:22:24,493 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_163540-sleeping-master', 185 bars, 737 beats, created=1781648544470
+2026-06-16 19:22:24,817 [INFO] ui.app: Audio loaded: sr=44100, duration=376013ms, samples=16582188
+2026-06-16 19:22:24,818 [INFO] ui.app: Loaded arrangement: C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_163540-sleeping\20260612_163540-sleeping.arrangement.master.json
+2026-06-16 19:22:24,829 [INFO] ui.app: [CHECKPOINT] Exiting load_file() successfully
+2026-06-16 19:23:10,645 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 19:23:20,201 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 17 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 19:23:44,956 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_163540-sleeping-master', 185 bars, 737 beats, created=1781648544470
+2026-06-16 19:23:58,797 [INFO] ui.mix_app: Added 20 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_163540-sleeping/20260612_163540-sleeping.arrangement.master.json
+2026-06-16 19:24:33,224 [INFO] file_io.mix_store: Saved mix 'New Mix' (37 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 19:24:47,361 [INFO] file_io.mix_store: Loaded mix '20260612_221624-ciudad-master' with 0 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-ciudad/20260612_221624-ciudad.arrangement.master.json
+2026-06-16 19:25:07,958 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 37 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 19:25:46,612 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-ciudad-master', 192 bars, 768 beats, created=1781648370362
+2026-06-16 19:26:03,409 [INFO] ui.mix_app: Added 19 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-ciudad/20260612_221624-ciudad.arrangement.master.json
+2026-06-16 19:26:12,761 [INFO] file_io.mix_store: Saved mix 'New Mix' (56 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 19:42:07,802 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 19:42:24,680 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 56 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 19:42:30,915 [INFO] playback.mix_engine: Loaded 'chorus 5': 323000–338560 ms (15.56s, 686196 frames)
+2026-06-16 19:42:47,859 [INFO] playback.mix_engine: Loaded 'intro 1': 0–15340 ms (15.34s, 676494 frames)
+2026-06-16 19:43:03,979 [INFO] playback.mix_engine: Loaded 'intro 2': 15340–30710 ms (15.37s, 677817 frames)
+2026-06-16 19:43:12,454 [INFO] playback.mix_engine: Loaded 'intro 3': 30710–46070 ms (15.36s, 677376 frames)
+2026-06-16 19:43:20,494 [INFO] playback.mix_engine: Loaded 'chorus 11': 291830–307190 ms (15.36s, 677376 frames)
+2026-06-16 19:43:34,095 [INFO] playback.mix_engine: Loaded 'chorus 5': 192240–224230 ms (31.99s, 1410759 frames)
+2026-06-16 20:00:13,190 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 20:00:19,988 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 56 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 20:00:25,477 [INFO] playback.mix_engine: Loaded 'intro 4': 48220–72230 ms (24.01s, 1058841 frames)
+2026-06-16 20:00:33,459 [INFO] playback.mix_engine: Loaded 'inst 5': 151040–179770 ms (28.73s, 1266993 frames)
+2026-06-16 20:03:01,725 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 20:03:09,662 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 56 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 20:03:36,228 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-bourgie-master', 182 bars, 725 beats, created=1781643671484
+2026-06-16 20:03:38,467 [INFO] ui.mix_app: Added 1 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/20260612_221624-bourgie.arrangement.master.json
+2026-06-16 20:07:54,854 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 20:08:00,647 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 56 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 20:08:07,790 [INFO] playback.mix_engine: Loaded 'intro 1': 0–15340 ms (15.34s, 676494 frames)
+2026-06-16 20:08:16,660 [INFO] playback.mix_engine: Loaded 'chorus 5': 323000–338560 ms (15.56s, 686196 frames)
+2026-06-16 20:08:23,900 [INFO] playback.mix_engine: Loaded 'chorus 5': 138230–153590 ms (15.36s, 677376 frames)
+2026-06-16 20:08:30,977 [INFO] playback.mix_engine: Loaded 'solo': 338560–357910 ms (19.35s, 853335 frames)
+2026-06-16 20:08:44,763 [INFO] playback.mix_engine: Loaded 'end': 353270–376020 ms (22.74s, 1002981 frames)
+2026-06-16 20:08:50,776 [INFO] playback.mix_engine: Loaded 'intro 1': 220–16220 ms (16.00s, 705600 frames)
+2026-06-16 20:24:20,860 [INFO] file_io.mix_store: Saved mix 'New Mix' (54 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 20:42:52,595 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 20:43:01,139 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 54 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 20:43:30,790 [INFO] file_io.mix_store: Saved mix 'New Mix' (55 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 20:50:41,591 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 20:50:48,511 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 55 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 20:51:10,101 [INFO] file_io.mix_store: Saved mix 'New Mix' (55 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 20:52:21,395 [INFO] file_io.mix_store: Saved mix 'New Mix' (55 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 20:52:30,720 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 20:52:37,222 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 55 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 20:56:36,790 [INFO] file_io.mix_store: Saved mix 'New Mix' (51 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 21:19:50,649 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 21:19:56,223 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 51 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 21:19:57,008 [INFO] playback.transition_render: Rendered transition 'Transition - 1': 2116800 frames (48.00s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_33.wav
+2026-06-16 21:20:19,227 [INFO] playback.mix_engine: Loaded 'Transition - 1': 0–48000 ms (48.00s, 2116800 frames)
+2026-06-16 21:21:08,605 [INFO] playback.mix_engine: Loaded 'intro 1 + intro 2 + intro 3': 220–48220 ms (48.00s, 2116800 frames)
+2026-06-16 21:21:47,515 [INFO] playback.mix_engine: Loaded 'Transition - 1': 0–48000 ms (48.00s, 2116800 frames)
+2026-06-16 21:25:16,363 [INFO] playback.mix_engine: Loaded 'Transition - 1': 0–48000 ms (48.00s, 2116800 frames)
+2026-06-16 21:25:27,424 [INFO] playback.mix_engine: Loaded 'Transition - 1': 0–48000 ms (48.00s, 2116800 frames)
+2026-06-16 21:25:30,465 [INFO] playback.mix_engine: Loaded 'Transition - 1': 0–48000 ms (48.00s, 2116800 frames)
+2026-06-16 21:25:46,871 [INFO] playback.transition_render: Rendered transition 'Transition - 2': 676494 frames (15.34s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_15.wav
+2026-06-16 21:25:59,880 [INFO] playback.mix_engine: Loaded 'chorus 5': 323000–338560 ms (15.56s, 686196 frames)
+2026-06-16 21:26:16,409 [INFO] playback.mix_engine: Loaded 'Transition - 2': 0–15340 ms (15.34s, 676494 frames)
+2026-06-16 21:26:32,548 [INFO] playback.mix_engine: Loaded 'intro 1': 0–15340 ms (15.34s, 676494 frames)
+2026-06-16 21:31:38,041 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 21:31:44,741 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 51 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 21:31:45,548 [INFO] playback.transition_render: Rendered transition 'Transition - 1': 2116800 frames (48.00s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_33.wav
+2026-06-16 21:31:55,299 [INFO] playback.mix_engine: Loaded 'Transition - 1': 0–48000 ms (48.00s, 2116800 frames)
+2026-06-16 21:32:44,640 [INFO] playback.mix_engine: Loaded 'intro 1 + intro 2 + intro 3': 220–48220 ms (48.00s, 2116800 frames)
+2026-06-16 21:32:55,730 [INFO] playback.mix_engine: Loaded 'intro 4': 48220–72230 ms (24.01s, 1058841 frames)
+2026-06-16 21:33:17,860 [INFO] playback.transition_render: Rendered transition 'Transition - 2': 676494 frames (15.34s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_15.wav
+2026-06-16 21:33:30,673 [INFO] playback.mix_engine: Loaded 'chorus 5': 323000–338560 ms (15.56s, 686196 frames)
+2026-06-16 21:33:47,199 [INFO] playback.mix_engine: Loaded 'Transition - 2': 0–15340 ms (15.34s, 676494 frames)
+2026-06-16 21:34:03,350 [INFO] playback.mix_engine: Loaded 'intro 1': 0–15340 ms (15.34s, 676494 frames)
+2026-06-16 21:34:19,463 [INFO] playback.mix_engine: Loaded 'intro 2': 15340–30710 ms (15.37s, 677817 frames)
+2026-06-16 21:34:48,191 [INFO] playback.mix_engine: Loaded 'chorus 4': 299600–323000 ms (23.40s, 1031940 frames)
+2026-06-16 21:35:12,534 [INFO] playback.mix_engine: Loaded 'Transition - 2': 0–15340 ms (15.34s, 676494 frames)
+2026-06-16 21:35:28,653 [INFO] playback.mix_engine: Loaded 'intro 2': 15340–30710 ms (15.37s, 677817 frames)
+2026-06-16 21:35:56,713 [INFO] playback.transition_render: Rendered transition 'Transition - 2': 676494 frames (15.34s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_14.wav
+2026-06-16 21:35:57,479 [INFO] playback.transition_render: Rendered transition 'Transition - 1': 2116800 frames (48.00s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_32.wav
+2026-06-16 21:35:57,514 [INFO] file_io.mix_store: Saved mix 'New Mix' (50 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 21:37:44,166 [INFO] playback.mix_engine: Loaded 'chorus 10': 320240–336230 ms (15.99s, 705159 frames)
+2026-06-16 21:54:05,005 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 21:54:12,221 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 50 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 22:17:36,217 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 22:17:42,946 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 50 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 22:51:19,475 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 22:51:26,559 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 50 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 22:52:58,975 [INFO] playback.transition_render: Rendered transition 'Transition - 3': 1411641 frames (32.01s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_16.wav
+2026-06-16 22:53:35,507 [INFO] playback.mix_engine: Loaded 'intro 2 + intro 3': 15340–46070 ms (30.73s, 1355193 frames)
+2026-06-16 22:54:07,278 [INFO] playback.mix_engine: Loaded 'Transition - 3': 0–32010 ms (32.01s, 1411641 frames)
+2026-06-16 22:54:40,074 [INFO] playback.mix_engine: Loaded 'chorus 1': 46070–61430 ms (15.36s, 677376 frames)
+2026-06-16 23:04:44,099 [INFO] file_io.mix_store: Saved mix 'New Mix' (0 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 23:04:47,897 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 0 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 23:05:08,078 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_163540-sleeping-master', 185 bars, 737 beats, created=1781648544470
+2026-06-16 23:05:28,099 [INFO] ui.mix_app: Added 20 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_163540-sleeping/20260612_163540-sleeping.arrangement.master.json
+2026-06-16 23:06:07,944 [INFO] playback.mix_engine: Loaded 'chorus 5': 138230–153590 ms (15.36s, 677376 frames)
+2026-06-16 23:06:26,108 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-ciudad-master', 192 bars, 768 beats, created=1781648370362
+2026-06-16 23:06:35,528 [INFO] ui.mix_app: Added 21 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-ciudad/20260612_221624-ciudad.arrangement.master.json
+2026-06-16 23:06:52,165 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-ciudad-master', 192 bars, 768 beats, created=1781648370362
+2026-06-16 23:07:00,720 [INFO] ui.mix_app: Added 21 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-ciudad/20260612_221624-ciudad.arrangement.master.json
+2026-06-16 23:07:21,600 [INFO] playback.mix_engine: Loaded 'end': 353270–376020 ms (22.74s, 1002981 frames)
+2026-06-16 23:07:44,033 [INFO] playback.mix_engine: Loaded 'outro': 322550–353270 ms (30.72s, 1354752 frames)
+2026-06-16 23:08:35,216 [INFO] playback.transition_render: Rendered transition 'Transition - 1': 1411200 frames (32.00s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_19.wav
+2026-06-16 23:09:03,001 [INFO] playback.mix_engine: Loaded 'chorus 11': 291830–307190 ms (15.36s, 677376 frames)
+2026-06-16 23:09:19,649 [INFO] playback.mix_engine: Loaded 'chorus 12': 307190–322550 ms (15.36s, 677376 frames)
+2026-06-16 23:09:35,479 [INFO] playback.mix_engine: Loaded 'Transition - 1': 0–32000 ms (32.00s, 1411200 frames)
+2026-06-16 23:10:08,314 [INFO] playback.mix_engine: Loaded 'intro 3': 32220–48220 ms (16.00s, 705600 frames)
+2026-06-16 23:19:46,420 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 23:19:59,506 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 0 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 23:20:31,019 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 23:20:37,555 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 0 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 23:20:51,126 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_163540-sleeping-master', 185 bars, 737 beats, created=1781648544470
+2026-06-16 23:20:58,892 [INFO] ui.mix_app: Added 19 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_163540-sleeping/20260612_163540-sleeping.arrangement.master.json
+2026-06-16 23:21:17,114 [INFO] file_io.arrangement_store: Loaded arrangement: name='20260612_221624-ciudad-master', 192 bars, 768 beats, created=1781648370362
+2026-06-16 23:21:29,341 [INFO] ui.mix_app: Added 21 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-ciudad/20260612_221624-ciudad.arrangement.master.json
+2026-06-16 23:22:08,860 [INFO] file_io.mix_store: Saved mix 'New Mix' (39 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json
+2026-06-16 23:22:17,307 [INFO] file_io.mix_store: Loaded mix '20260612_163540-sleeping-master' with 0 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_163540-sleeping/20260612_163540-sleeping.arrangement.master.json
+2026-06-16 23:22:29,254 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 39 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 23:22:41,088 [INFO] playback.mix_engine: Loaded 'chorus 11': 291830–307190 ms (15.36s, 677376 frames)
+2026-06-16 23:22:41,098 [INFO] playback.mix_engine: Cached section 16 ('chorus 11')
+2026-06-16 23:22:41,444 [INFO] playback.mix_engine: Loaded 'chorus 12': 307190–322550 ms (15.36s, 677376 frames)
+2026-06-16 23:22:41,454 [INFO] playback.mix_engine: Cached section 17 ('chorus 12')
+2026-06-16 23:22:41,812 [INFO] playback.mix_engine: Loaded 'intro 1': 220–16220 ms (16.00s, 705600 frames)
+2026-06-16 23:22:41,822 [INFO] playback.mix_engine: Cached section 18 ('intro 1')
+2026-06-16 23:22:41,824 [INFO] playback.mix_engine: Cache hit: section 17 ('chorus 12')
+2026-06-16 23:22:42,220 [INFO] playback.mix_engine: Loaded 'intro 2': 16220–32220 ms (16.00s, 705600 frames)
+2026-06-16 23:22:42,229 [INFO] playback.mix_engine: Pre-loaded section 19 ('intro 2')
+2026-06-16 23:22:58,203 [INFO] playback.mix_engine: Cache hit: section 18 ('intro 1')
+2026-06-16 23:22:58,661 [INFO] playback.mix_engine: Loaded 'intro 3': 32220–48220 ms (16.00s, 705600 frames)
+2026-06-16 23:22:58,670 [INFO] playback.mix_engine: Pre-loaded section 20 ('intro 3')
+2026-06-16 23:23:14,703 [INFO] playback.mix_engine: Cache hit: section 19 ('intro 2')
+2026-06-16 23:23:15,295 [INFO] playback.mix_engine: Loaded 'intro 4': 48220–72230 ms (24.01s, 1058841 frames)
+2026-06-16 23:23:15,312 [INFO] playback.mix_engine: Pre-loaded section 21 ('intro 4')
+2026-06-16 23:23:31,244 [INFO] playback.mix_engine: Cache hit: section 20 ('intro 3')
+2026-06-16 23:23:31,683 [INFO] playback.mix_engine: Loaded 'inst 1': 72230–96230 ms (24.00s, 1058400 frames)
+2026-06-16 23:23:31,694 [INFO] playback.mix_engine: Pre-loaded section 22 ('inst 1')
+2026-06-16 23:38:34,360 [INFO] __main__: === Mix Editor Started ===
+2026-06-16 23:38:40,703 [INFO] file_io.mix_store: Loaded mix 'New Mix' with 39 section(s) from C:/Users/lssilva30/pessoal/code/allin1player/music/20260612_221624-bourgie/mix-editor.json
+2026-06-16 23:38:57,557 [INFO] playback.transition_render: Rendered transition 'Transition - 1': 705600 frames (16.00s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_18.wav
+2026-06-16 23:39:18,308 [INFO] playback.transition_render: Rendered transition 'Transition - 2': 1411641 frames (32.01s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_10.wav
+2026-06-16 23:39:51,549 [INFO] playback.mix_engine: Loaded 'chorus 10': 259190–291830 ms (32.64s, 1439424 frames)
+2026-06-16 23:39:51,555 [INFO] playback.mix_engine: Cached section 16 ('chorus 10')
+2026-06-16 23:39:51,849 [INFO] playback.mix_engine: Loaded 'chorus 11': 291830–307190 ms (15.36s, 677376 frames)
+2026-06-16 23:39:51,856 [INFO] playback.mix_engine: Cached section 17 ('chorus 11')
+2026-06-16 23:39:51,861 [INFO] playback.mix_engine: Loaded 'Transition - 1': 0–16000 ms (16.00s, 705600 frames)
+2026-06-16 23:39:51,861 [INFO] playback.mix_engine: Cached section 18 ('Transition - 1')
+2026-06-16 23:39:51,862 [INFO] playback.mix_engine: Cache hit: section 17 ('chorus 11')
+2026-06-16 23:40:07,923 [INFO] playback.mix_engine: Cache hit: section 17 ('chorus 11')
+2026-06-16 23:40:08,240 [INFO] playback.mix_engine: Loaded 'intro 2': 16220–32220 ms (16.00s, 705600 frames)
+2026-06-16 23:40:08,246 [INFO] playback.mix_engine: Pre-loaded section 19 ('intro 2')
+2026-06-16 23:40:23,287 [INFO] playback.mix_engine: Cache hit: section 18 ('Transition - 1')
+2026-06-16 23:40:23,699 [INFO] playback.mix_engine: Loaded 'intro 3': 32220–48220 ms (16.00s, 705600 frames)
+2026-06-16 23:40:23,709 [INFO] playback.mix_engine: Pre-loaded section 20 ('intro 3')
+2026-06-16 23:40:39,314 [INFO] playback.mix_engine: Cache hit: section 19 ('intro 2')
+2026-06-16 23:40:39,711 [INFO] playback.mix_engine: Loaded 'intro 4': 48220–72230 ms (24.01s, 1058841 frames)
+2026-06-16 23:40:39,718 [INFO] playback.mix_engine: Pre-loaded section 21 ('intro 4')
+2026-06-16 23:40:54,249 [INFO] playback.mix_engine: Loaded 'chorus 5': 138230–153590 ms (15.36s, 677376 frames)
+2026-06-16 23:40:54,256 [INFO] playback.mix_engine: Cached section 8 ('chorus 5')
+2026-06-16 23:40:54,608 [INFO] playback.mix_engine: Loaded 'chorus 6': 153590–184310 ms (30.72s, 1354752 frames)
+2026-06-16 23:40:54,617 [INFO] playback.mix_engine: Cached section 9 ('chorus 6')
+2026-06-16 23:40:54,625 [INFO] playback.mix_engine: Loaded 'Transition - 2': 0–32010 ms (32.01s, 1411641 frames)
+2026-06-16 23:40:54,625 [INFO] playback.mix_engine: Cached section 10 ('Transition - 2')
+2026-06-16 23:40:54,626 [INFO] playback.mix_engine: Cache hit: section 9 ('chorus 6')
+2026-06-16 23:41:25,557 [INFO] playback.mix_engine: Cache hit: section 9 ('chorus 6')
+2026-06-16 23:41:25,981 [INFO] playback.mix_engine: Loaded 'verse 2': 184310–199670 ms (15.36s, 677376 frames)
+2026-06-16 23:41:25,988 [INFO] playback.mix_engine: Pre-loaded section 11 ('verse 2')
+2026-06-16 23:41:56,303 [INFO] playback.mix_engine: Cache hit: section 10 ('Transition - 2')
+2026-06-16 23:41:56,653 [INFO] playback.mix_engine: Loaded 'verse 3': 199670–215030 ms (15.36s, 677376 frames)
+2026-06-16 23:41:56,660 [INFO] playback.mix_engine: Pre-loaded section 12 ('verse 3')
+2026-06-16 23:42:28,301 [INFO] playback.mix_engine: Cache hit: section 11 ('verse 2')
+2026-06-16 23:42:28,648 [INFO] playback.mix_engine: Loaded 'chorus 7': 215030–230390 ms (15.36s, 677376 frames)
+2026-06-16 23:42:28,654 [INFO] playback.mix_engine: Pre-loaded section 13 ('chorus 7')
+2026-06-16 23:42:53,268 [INFO] playback.transition_render: Rendered transition 'Transition - 2': 1411641 frames (32.01s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_10.wav
+2026-06-16 23:42:53,900 [INFO] playback.transition_render: Rendered transition 'Transition - 1': 705600 frames (16.00s) -> C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\transitions\transition_18.wav
+2026-06-16 23:42:53,925 [INFO] file_io.mix_store: Saved mix 'New Mix' (39 sections) to C:\Users\lssilva30\pessoal\code\allin1player\music\20260612_221624-bourgie\mix-editor.json

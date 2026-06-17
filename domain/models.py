@@ -21,6 +21,7 @@ class Bar:
     idx: int
     beats: tuple[Beat, ...]
     audiosource: str = ""
+    color: str = ""
 
     @property
     def start_beat_idx(self) -> int:
@@ -46,7 +47,6 @@ class Section:
     local_key: str = ""
     local_bpm: float = 0.0
     is_transition: bool = False
-    color: str = ""
     transition_start_bpm: float = 0.0
     transition_finish_bpm: float = 0.0
     fade_out_bars: list[Bar] = field(default_factory=list)

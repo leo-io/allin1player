@@ -26,9 +26,9 @@ class MixStore:
     # ------------------------------------------------------------------ section (de)serialization
 
     @staticmethod
-    def _section_from_data(sec_data: dict, sec_idx: int) -> Section:
+    def _bars_from_data(bars_data: list, offset: int = 0) -> list[Bar]:
         bars = []
-        for bar_idx, bar_data in enumerate(sec_data.get("bars", [])):
+        for bar_idx, bar_data in enumerate(bars_data):
             beats = tuple(
                 Beat(
                     start_ms=int(beat.get("start_ms", beat.get("time_ms", 0))),
@@ -38,14 +38,44 @@ class MixStore:
                 for beat in bar_data.get("beats", [])
             )
             bars.append(Bar(
-                idx=bar_data.get("idx", bar_idx),
+                idx=bar_data.get("idx", offset + bar_idx),
                 beats=beats,
                 audiosource=bar_data.get("audiosource", ""),
+                color=bar_data.get("color", ""),
             ))
+        return bars
+
+    @staticmethod
+    def _bars_to_data(bars: list[Bar]) -> list[dict]:
+        return [
+            {
+                "idx": bar.idx,
+                "audiosource": bar.audiosource,
+                "color": bar.color,
+                "beats": [
+                    {
+                        "start_ms": beat.start_ms,
+                        "finish_ms": beat.finish_ms,
+                        "position": beat.position,
+                    }
+                    for beat in bar.beats
+                ],
+            }
+            for bar in bars
+        ]
+
+    @staticmethod
+    def _section_from_data(sec_data: dict, sec_idx: int) -> Section:
+        bars = MixStore._bars_from_data(sec_data.get("bars", []))
+        fade_out_bars = MixStore._bars_from_data(sec_data.get("fade_out_bars", []))
+        fade_in_bars = MixStore._bars_from_data(sec_data.get("fade_in_bars", []))
         return Section(
             idx=sec_data.get("idx", sec_idx),
             name=sec_data.get("name", f"section_{sec_idx}"),
             bars=bars,
+            is_transition=sec_data.get("is_transition", False),
+            fade_out_bars=fade_out_bars,
+            fade_in_bars=fade_in_bars,
         )
 
     @staticmethod
@@ -53,21 +83,10 @@ class MixStore:
         return {
             "idx": sec.idx,
             "name": sec.name,
-            "bars": [
-                {
-                    "idx": bar.idx,
-                    "audiosource": bar.audiosource,
-                    "beats": [
-                        {
-                            "start_ms": beat.start_ms,
-                            "finish_ms": beat.finish_ms,
-                            "position": beat.position,
-                        }
-                        for beat in bar.beats
-                    ],
-                }
-                for bar in sec.bars
-            ],
+            "is_transition": sec.is_transition,
+            "bars": MixStore._bars_to_data(sec.bars),
+            "fade_out_bars": MixStore._bars_to_data(sec.fade_out_bars),
+            "fade_in_bars": MixStore._bars_to_data(sec.fade_in_bars),
         }
 
     # ------------------------------------------------------------------ load / save
