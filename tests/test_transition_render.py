@@ -9,7 +9,7 @@ import soundfile as sf
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from domain.models import Bar, Beat, Section  # noqa: E402
-from playback.transition_render import render_transition  # noqa: E402
+from playback.transition_render import render_transition, _ms_to_frames  # noqa: E402
 
 SR = 44100
 
@@ -49,14 +49,30 @@ def test_render_transition(tmp_path: Path):
     assert wav_path.exists()
     assert bars[0].audiosource == str(wav_path)
 
-    # master-clock invariant: rendered length == sum of fade-in slot frames (8 * 500ms)
     rendered, sr = sf.read(str(wav_path), always_2d=True)
     assert sr == SR
-    expected_frames = sum(int(round(500 * SR / 1000)) for _ in range(8))
+
+    # No NaN or inf in the output
+    assert not np.any(np.isnan(rendered))
+    assert not np.any(np.isinf(rendered))
+
+    # Total frame count = sum of per-beat target durations
+    # target_ms[i] = 480 + (500 - 480) * (i / 7) for i in 0..7
+    n_beats = 8
+    out_beat_ms, in_beat_ms = 480, 500
+    expected_frames = sum(
+        _ms_to_frames(out_beat_ms + (in_beat_ms - out_beat_ms) * (i / (n_beats - 1)), SR)
+        for i in range(n_beats)
+    )
     assert len(rendered) == expected_frames
 
-    # last beat finish maps to (very near) the end of the buffer
-    assert abs(bars[-1].beats[-1].finish_ms - 8 * 500) <= 1
+    # Beat 0: out_gain=1.0, in_gain=0.0 → audio dominated by fade-out value (0.2)
+    # Sample the middle of beat 0 (far from taper edges)
+    beat0_frames = _ms_to_frames(out_beat_ms, SR)  # target_dur for beat 0
+    mid0 = beat0_frames // 2
+    assert np.allclose(rendered[mid0 - 50 : mid0 + 50], 0.2, atol=0.05)
 
-    # plain sum + clip: 0.2 + 0.5 = 0.7 across the overlap
-    assert np.allclose(rendered[100:200], 0.7, atol=1e-4)
+    # Beat 7: out_gain=0.0, in_gain=1.0 → audio dominated by fade-in value (0.5)
+    beat7_frames = _ms_to_frames(in_beat_ms, SR)  # target_dur for beat 7
+    mid7 = len(rendered) - beat7_frames // 2
+    assert np.allclose(rendered[mid7 - 50 : mid7 + 50], 0.5, atol=0.05)
